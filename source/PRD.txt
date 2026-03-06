@@ -1,0 +1,1678 @@
+ScholarLogic — Product Requirements Document (PRD)
+Version: 1.0 Date: March 1, 2026 Status: Ready for Development Prepared for: Development Team / AI Build Tools
+SECTION 1 — PROJECT OVERVIEW & GOALS
+1.1 Executive Summary
+ScholarLogic is an AI-powered scholarship matching and application management platform built for Indian students across all education levels — from high school through PhD. It transforms the scholarship discovery process from manual, error-prone searching into a precision-engineered matching experience powered by a multi-layer AI pipeline.
+The platform ingests scholarship data from complex PDF sources using DeepSeek-v3.1 (MegaLLM), extracts granular eligibility criteria into a structured multi-dimensional schema, and uses Gemini-2.5-Flash to match students against both hard deterministic constraints and soft demographic signals. Students build a comprehensive "Student Data Contract" profile that powers AI matching, SOP generation, and document management — all within a single authenticated platform.
+1.2 Problem Statement
+Indian students face three critical failure points in scholarship discovery:
+Discovery Failure — Scholarships are scattered across government portals, NGO websites, university bulletins, and PDF circulars. There is no single aggregated, structured source of truth.
+Eligibility Mismatch — Students apply to scholarships they are ineligible for (wrong course, wrong year, wrong income bracket) and miss scholarships they would qualify for (disability-specific, first-gen, state-specific) because eligibility criteria are buried in unstructured text.
+Application Friction — Writing unique, personalized Statements of Purpose for each scholarship is time-intensive, and managing certificates, transcripts, and application statuses across multiple platforms creates administrative overload.
+1.3 Solution Statement
+ScholarLogic solves all three problems through:
+A continuously updated scholarship database fed by an automated AI PDF ingestion pipeline
+A two-layer matching engine (hard deterministic filtering + Gemini-2.5-Flash soft matching) that produces ranked, genuinely eligible scholarship lists
+An AI SOP generator that uses the student's full profile context to produce personalized, compelling narratives
+A unified Document Vault and Application Tracker that centralizes the entire scholarship lifecycle
+1.4 Business Goals
+Goal
+Target
+Timeline
+Student signups
+10,000 registered users
+Month 6
+Scholarship database size
+25,000+ indexed scholarships
+Month 3
+Match accuracy rate
+≥92% genuine eligibility
+Ongoing
+SOP generation adoption
+60% of active users
+Month 4
+Paid plan conversion
+15% of free users
+Month 6
+Application success rate
+25% of applied → Won
+Month 9
+1.5 Strategic Goals
+Establish ScholarLogic as India's most accurate scholarship matching platform
+Build the largest structured, machine-readable scholarship database in India
+Create a defensible AI moat through continuous pipeline improvement and student data network effects
+Expand from B2C (students) to B2B (universities, coaching institutes, NGOs) by Month 9
+SECTION 2 — TARGET AUDIENCE DEFINITION
+2.1 Primary User — The Student
+Persona A: Priya — The First-Generation Undergraduate
+Age: 18–22
+Education: Undergraduate (Engineering/Science/Commerce)
+Location: Tier 2/3 city, Maharashtra or similar state
+Income: Annual household income below ₹2.5L
+Profile signals: First-generation learner, state domicile residency, possible disability status
+Pain points: Doesn't know which scholarships exist for her specific profile, wastes time on ineligible applications, struggles to write compelling SOPs
+Tech comfort: High (smartphone-native, uses UPI, comfortable with form-filling)
+Primary device: Mobile (60%), Desktop (40%)
+Motivation: Reduce financial burden of education, achieve independence
+Persona B: Arjun — The Postgraduate Researcher
+Age: 22–28
+Education: Masters/PhD (STEM)
+Location: Metro city, near university campus
+Income: Self-supported/stipend-dependent
+Profile signals: High GPA, specific course restriction relevance, research fellowship interest
+Pain points: Most scholarship platforms are undergraduate-focused, needs to filter by research area and stipend type, manages complex multi-document applications
+Tech comfort: Very high
+Primary device: Desktop (70%), Mobile (30%)
+Motivation: Fund research, reduce loan burden, build academic credentials
+Persona C: Meera — The High School Finisher
+Age: 16–18
+Education: Class 12 / Transitioning to undergraduate
+Location: Rural/semi-urban, any state
+Profile signals: Merit-based eligibility, SC/ST/OBC reservation, state board results
+Pain points: Zero awareness of scholarship landscape, family has no prior experience navigating government schemes, overwhelming form complexity
+Tech comfort: Moderate
+Primary device: Mobile (85%)
+Motivation: First family member to attend college, needs full financial support
+2.2 Secondary User — The Platform Administrator
+Persona D: Dev/Admin Operator
+Role: Backend developer or platform administrator at ScholarLogic
+Responsibilities: Monitor PDF ingestion pipeline health, verify DeepSeek-v3.1 extraction accuracy, manage duplicate detection, track insertedCount metrics, debug failed extractions
+Access: /admin/pipeline only
+Primary need: Real-time visibility into pipeline status, error tracking, idempotency verification
+2.3 Future Secondary User (Month 9+)
+Persona E: University Financial Aid Officer
+Role: Institutional buyer, B2B customer
+Need: Bulk student matching, white-label portal, API access to scholarship database
+This persona informs the Pro plan's API access feature but is not a primary design target for v1.0
+2.4 Audience Segmentation by Education Level
+Level
+% of Target
+Key Eligibility Signals
+High School (Class 10–12)
+20%
+State board score, income, category
+Undergraduate
+45%
+Course, university, GPA, year, domicile
+Postgraduate
+25%
+Specialization, research area, institution tier
+PhD / Research
+10%
+Fellowship type, supervisor, research domain
+SECTION 3 — COMPLETE PAGE INVENTORY
+3.1 Public / Marketing Pages
+Page
+Route
+Priority
+Purpose
+Landing Page
+/
+P0
+Primary conversion page — hero, value props, social proof, CTA
+How It Works
+/how-it-works
+P0
+Technical trust-building — AI pipeline explanation, flowcharts
+Features
+/features
+P1
+Exhaustive capability showcase for evaluation-stage visitors
+Pricing
+/pricing
+P0
+Conversion page — tier comparison, billing toggle, FAQ
+Sign In
+/signin
+P0
+Auth entry for returning users
+Sign Up
+/signup
+P0
+Auth entry for new users with profile bootstrapping
+Forgot Password
+/forgot-password
+P0
+Auth recovery flow
+About (Future)
+/about
+P2
+Team, mission, story — Month 3
+Blog (Future)
+/blog
+P2
+SEO content, scholarship guides — Month 4
+Contact
+/contact
+P2
+Support intake form
+3.2 Authenticated Student Dashboard Pages
+Page
+Route
+Priority
+Purpose
+Dashboard Overview
+/dashboard
+P0
+Home base — stats, top match, recent activity, quick upload
+My Matches
+/dashboard/matches
+P0
+Full scholarship match list with filters and sort
+Applications
+/dashboard/applications
+P0
+Application pipeline tracker — Table and Kanban views
+Document Vault
+/dashboard/vault
+P0
+Cloudinary-backed file manager for all certificate types
+AI Assistant
+/dashboard/assistant
+P1
+Gemini-2.5-Flash chat interface for scholarship queries
+SOP Generator
+/dashboard/sop
+P1
+AI-powered SOP drafting with tone/length controls
+Profile Setup
+/dashboard/profile
+P0
+4-step Student Data Contract builder
+Settings
+/dashboard/settings
+P2
+Account preferences, notifications, plan management
+3.3 Admin / Developer Pages
+Page
+Route
+Priority
+Purpose
+Pipeline Monitor
+/admin/pipeline
+P0
+PDF ingestion status, extraction stats, live logs
+Scholarship DB (Future)
+/admin/scholarships
+P1
+Manual scholarship CRUD, deduplication review
+User Management (Future)
+/admin/users
+P2
+Student account oversight, plan management
+3.4 System / Utility Pages
+Page
+Route
+Priority
+Purpose
+404 Not Found
+/404
+P1
+Branded error page with navigation back
+500 Server Error
+/500
+P1
+Branded error with support link
+Email Verification
+/verify-email
+P0
+Post-signup verification gate
+Onboarding Flow
+/onboarding
+P0
+Guided first-time profile setup wizard post-signup
+4.1 — AI MATCHING ENGINE
+Feature 4.1.1 — Hard Constraint Filtering
+Priority: Must-Have (P0)
+Detailed Description: The hard constraint filtering layer is the first gate in the two-layer matching pipeline. It operates as a pure deterministic logic engine — no AI, no probabilistic scoring — that instantly eliminates scholarships where the student's profile creates an absolute disqualification. Three primary constraint fields drive this layer: courseRestriction (e.g., "Engineering students only"), categoryRestriction (e.g., "SC/ST applicants only"), and yearRestriction (e.g., "Final year students only"). Additionally, education level, state domicile requirements, and income ceiling thresholds are evaluated as hard constraints.
+The critical design principle is that a failed hard constraint means absolute exclusion — the scholarship never appears in the student's match list regardless of any other eligibility factors. This prevents the most damaging UX failure: a student investing hours into an application for a scholarship they were never eligible for.
+The system normalizes both scholarship constraints and student profile values before comparison to handle variations in naming conventions (e.g., "B.Tech" vs "BTech" vs "Bachelor of Technology" all map to the same normalized course token).
+User Interaction Flow:
+Student completes profile (course: "Computer Science", year: "2nd Year", category: "General")
+         ↓
+Student navigates to My Matches page
+         ↓
+System runs hard constraint check against all active scholarships in DB:
+  ├── courseRestriction = "Engineering" → Student's normalized course token matches → PASS
+  ├── courseRestriction = "Medical" → No match → IMMEDIATE EXCLUDE (never shown)
+  ├── yearRestriction = "Final Year Only" → Student is 2nd Year → IMMEDIATE EXCLUDE
+  ├── categoryRestriction = "SC/ST Only" → Student is General → IMMEDIATE EXCLUDE
+  └── No restriction = null → No constraint applies → PASS
+         ↓
+Filtered scholarship pool (passed hard constraints) sent to soft matching layer
+         ↓
+Student sees match list — all visible scholarships have passed hard constraint check
+         ↓
+Student updates profile (changes year to "Final Year")
+         ↓
+Match list automatically recalculates — previously excluded final-year scholarships now appear
+Technical Requirements:
+MongoDB indexed query on courseRestriction, categoryRestriction, yearRestriction fields for sub-100ms filtering across 25,000+ scholarship records
+Normalization dictionary maintained for course aliases, category aliases, and education level aliases — stored as a reference collection
+Filtering logic runs server-side (Node.js/Python API endpoint) — never client-side
+Null constraint fields treated as "no restriction" — all students pass a null constraint
+Hard constraint check results cached per student profile hash — cache invalidated on any profile update
+Filter execution time target: ≤150ms for full 25,000 scholarship scan
+All constraint evaluations logged with pass/fail reason for debugging and accuracy auditing
+Success Criteria:
+Zero scholarships with failed hard constraints appear in any student's match list
+Filtering completes in ≤150ms for database of 25,000+ scholarships
+Profile update triggers match recalculation within 30 seconds
+Manual audit of 100 random student-match pairs confirms 100% hard constraint accuracy
+Normalization dictionary covers ≥95% of scholarship course/category naming variations found in Indian scholarship PDFs
+Feature 4.1.2 — Soft Demographic Matching (Gemini-2.5-Flash)
+Priority: Must-Have (P0)
+Detailed Description: After hard constraints eliminate absolute disqualifications, the soft matching layer uses Gemini-2.5-Flash to evaluate the remaining scholarship pool against the student's demographic, socioeconomic, and academic signals. Unlike hard constraints, soft matching operates on probabilistic signals — factors that make a student more or less likely to be eligible or competitive, rather than absolutely excluded.
+Soft matching signals include: first-generation learner status (strong signal for need-based and social mobility scholarships), disability status and type (matches disability-specific scholarships and government accessibility schemes), state residency beyond simple domicile (regional scholarships, state board-specific awards), minority community membership, sports or cultural achievement indicators, and specific GPA thresholds that are recommendations rather than hard cutoffs.
+Gemini-2.5-Flash receives a structured prompt containing the student's complete demographic profile and a batch of scholarships that have passed hard constraint filtering. It returns a relevance score and a brief eligibility rationale for each scholarship. This rationale is stored and surfaced to the student as a "Why This Matched" explanation.
+The model is prompted to be conservative — it should only elevate a scholarship's score when the student's profile contains positive eligibility signals, not merely the absence of disqualifying ones.
+User Interaction Flow:
+Hard constraint filter outputs pool of 400 eligible scholarships (from 25,000 total)
+         ↓
+Scholarship pool batched (50 per API call) → sent to Gemini-2.5-Flash with student profile
+         ↓
+Gemini evaluates each scholarship for soft signals:
+  ├── First-gen flag ON + scholarship targets "first-generation college students" → +high score
+  ├── Disability type "Visual Impairment" + scholarship for "visually impaired students" → +high score
+  ├── Maharashtra residency + scholarship restricted to "western Maharashtra students" → +medium score
+  ├── GPA 78% + scholarship "prefers 75%+ but not required" → +low-medium score
+  └── No demographic match signals → baseline score (scholarship still shown, ranked lower)
+         ↓
+Gemini returns: match_score (0-100), eligibility_rationale (1-2 sentences), confidence_level
+         ↓
+Final ranked list: top 27 scholarships sorted by combined score
+         ↓
+Student sees match cards with % score badge and can click "Why This Matched?"
+         ↓
+Tooltip/modal shows: "Matched because you are a first-generation learner from Maharashtra 
+         with a disability certificate — this scholarship specifically targets this demographic."
+Technical Requirements:
+Gemini-2.5-Flash API integration via Google AI SDK
+Batch processing: 50 scholarships per API call to manage token limits and latency
+Student profile serialized into structured JSON for consistent prompt formatting
+Prompt template versioned and stored — changes to prompt template trigger full re-matching
+Soft match scores stored in a MatchScore collection: {studentId, scholarshipId, score, rationale, generatedAt, promptVersion}
+Match scores cached with 24-hour TTL — refreshed on profile update or prompt version change
+Fallback behavior: if Gemini API unavailable, serve cached scores with "last updated X hours ago" indicator
+Rate limiting: queue-based batch processing during high-traffic periods to avoid API quota exhaustion
+Target: full soft match computation for one student against 400 filtered scholarships ≤45 seconds (async, not blocking UI)
+UI shows "Calculating your matches..." skeleton state during async computation
+Success Criteria:
+Soft matching elevates ≥15% more relevant scholarships per student compared to hard-filter-only baseline
+Match rationale strings are accurate, specific, and non-generic (validated by manual review of 50 sample rationales)
+Gemini API failure rate ≤0.5% — fallback to cached scores activates seamlessly
+Students who have first-gen or disability flags see ≥8 more matched scholarships than identical profiles without those flags
+"Why This Matched" tooltip rated as "helpful" by ≥70% of users who interact with it
+Feature 4.1.3 — Match Score Generation & Display
+Priority: Must-Have (P0)
+Detailed Description: Every scholarship in a student's match list carries a single composite match score expressed as a percentage (0–100%). This score combines the outputs of both the hard constraint layer (binary pass/fail, contributing to whether the scholarship appears at all) and the soft matching layer (Gemini's 0–100 relevance score). The display score is the Gemini soft score, normalized and presented as a whole-number percentage.
+Match scores drive the default sort order of the scholarship list (highest match % first) and are visually rendered as circular progress indicators on each scholarship card using CSS conic-gradient. The color of the score ring reflects the tier: 85–100% in brand violet #7B5CFA, 65–84% in blue #60A5FA, below 65% in muted #5C5A74.
+Score badges also appear on the Recommended For You section of the Dashboard Overview, providing instant at-a-glance quality signaling.
+User Interaction Flow:
+Student opens My Matches page
+         ↓
+Scholarship cards render with circular score rings:
+  ├── 96% → full violet ring, "96% Match" badge top-right of card
+  ├── 88% → nearly-full blue ring
+  └── 68% → partial muted ring
+         ↓
+Student hovers/clicks "96%" badge → tooltip: "Why This Matched?"
+         ↓
+Rationale displayed: "Strong match — first-generation learner, Maharashtra domicile, 
+         60%+ GPA, and undergraduate status all align with this scholarship's criteria."
+         ↓
+Student sorts by "Sort by: Match %" (default) or switches to "Sort by: Amount" or "Sort by: Deadline"
+Technical Requirements:
+CSS conic-gradient(#7B5CFA {score}%, #2A2840 0) for ring rendering — no canvas or SVG required
+Inner white circle overlaid (50px inner on 64px outer) to create ring effect
+Score percentage stored as integer in MatchScore collection
+Sort endpoint accepts sortBy param: matchScore (default), benefitAmount, deadline
+"Why This Matched?" tooltip fetches rationale from MatchScore.rationale field — no additional API call
+Score display rounds to nearest whole number (e.g., 95.7 → 96%)
+Skeleton loading state: grey animated ring while scores compute async
+Success Criteria:
+All match cards display score rings with correct color tier
+Score ring animation loads within 200ms of card render
+"Why This Matched?" tooltip appears within 100ms (data pre-loaded with card)
+Default sort by match % confirmed working in ≥99% of test cases
+Students report match scores as "easy to understand" in ≥80% of usability test sessions
+Feature 4.1.4 — Benefit Type Ranking & Filtering
+Priority: Must-Have (P0)
+Detailed Description: The scholarship database categorizes financial benefits into three distinct types rather than a single "amount" field: Stipend (recurring monthly payments), Tuition Waiver (partial or full tuition coverage, one-time or annual), and One-Time Grant (single disbursement, typically for equipment, travel, or application of a milestone). This categorization enables the matching engine to rank scholarships by total financial impact rather than just face value, and allows students to filter by the benefit structure that best fits their financial situation.
+A student managing monthly living expenses may prioritize high-stipend scholarships over large one-time grants. A student with tuition loan pressure may prioritize waivers. The filtering system respects these preferences and the default ranking weights stipend continuity higher than equivalent one-time amounts.
+User Interaction Flow:
+Student opens My Matches, sees all 27 results (default: sorted by match %)
+         ↓
+Student clicks "Stipend" filter chip
+         ↓
+List filters to 11 scholarships where benefit_type = "stipend"
+Cards show benefit displayed as "₹3,000 / month" (stipend) vs "₹45,000" (one-time)
+         ↓
+Student clicks "Sort by: Amount" → scholarships sorted by total annual value
+(Monthly stipends annualized: ₹3,000/mo = ₹36,000/year for comparison)
+         ↓
+Student clicks scholarship card → sees benefit breakdown:
+  ├── Stipend: ₹3,000/month (10 months/year)
+  ├── Tuition Waiver: N/A
+  └── Total Annual Value: ₹30,000
+Technical Requirements:
+Scholarship schema: benefits: { stipend: { amount: Number, frequency: String }, tuitionWaiver: { amount: Number, type: String }, oneTimeGrant: { amount: Number } }
+Annualized value computed server-side for sort comparison: (stipend.amount × 10) + tuitionWaiver.amount + oneTimeGrant.amount
+Filter chips trigger client-side filter on pre-loaded match data (no additional API call for filter change)
+Benefit type badge colors: Stipend rgba(123,92,250,0.15) violet, Tuition Waiver rgba(74,222,128,0.15) green, One-Time Grant rgba(250,204,21,0.15) yellow
+Benefit amount display format: stipend shows "/month" suffix, waiver shows "per year" or "one-time", grant shows flat amount
+Success Criteria:
+Benefit type filter correctly shows only scholarships of selected type in ≥99.9% of filter operations
+Annualized sort produces correct ordering validated against 20 test cases
+Students can identify benefit type from card badge without reading card body (visual clarity test)
+≥40% of users interact with at least one benefit type filter in their first session
+Feature 4.1.5 — Automatic Match Recalculation on Profile Update
+Priority: Must-Have (P0)
+Detailed Description: The match list is not static. Every time a student updates a profile field that influences eligibility — education level, course, year of study, GPA, state, first-gen status, disability status, category, or income bracket — the system triggers a full match recalculation. This ensures the platform remains accurate as the student's actual situation changes (e.g., year promotion, new disability certificate obtained, moved to a different state).
+Recalculation happens asynchronously — the student is not blocked from using the platform while it runs. A subtle "Updating your matches..." indicator appears on the My Matches page. When complete, the match count and list update with a brief animation highlighting new additions or removals.
+User Interaction Flow:
+Student is on Profile page, changes Year of Study from "2nd Year" to "3rd Year"
+         ↓
+Clicks "Save Changes"
+         ↓
+Profile saved → system detects yearRestriction-affecting field changed
+         ↓
+Recalculation queued (async job) — student sees "Saving..." → "Saved ✓"
+         ↓
+Student navigates to My Matches
+         ↓
+Page shows previous match list + "Updating your matches..." subtle banner
+         ↓
+Recalculation completes (30–45 seconds) → page refreshes match list
+         ↓
+"3 new scholarships added" green toast notification appears
+         ↓
+New cards highlighted with "New" badge for current session
+Technical Requirements:
+Profile save triggers webhook/event to matching service — pass changed field names as payload
+Matching service determines if changed fields are match-affecting (whitelist of triggering fields)
+Non-match-affecting fields (e.g., full name, phone number) do not trigger recalculation
+Async job queue (Redis/BullMQ or similar) handles recalculation without blocking API
+Job status polling: client polls /api/match-status/{userId} every 5 seconds
+"New" badge stored in session — cleared on page reload or after 1 hour
+Cache invalidation: student's MatchScore cache cleared when recalculation job starts
+"Updating matches..." banner dismissible by student
+Recalculation job target completion time: ≤60 seconds
+Success Criteria:
+Match list updates within 60 seconds of profile save for all match-affecting field changes
+Non-match-affecting profile saves do not trigger recalculation (confirmed by monitoring job queue)
+"New scholarship" notifications appear correctly for ≥95% of recalculations that produce new matches
+Zero cases where stale match list is shown without an "updating" indicator
+4.2 — SCHOLARSHIP DATABASE & INGESTION PIPELINE
+Feature 4.2.1 — PDF Ingestion Pipeline (DeepSeek-v3.1)
+Priority: Must-Have (P0)
+Detailed Description: The ingestion pipeline is the lifeblood of the ScholarLogic database. It is a Python-based automated system that accepts scholarship PDF documents from configured source URLs, submits them to DeepSeek-v3.1 (MegaLLM) for structured data extraction, validates the extracted fields, and writes clean records to the MongoDB Scholarship collection. The pipeline is the primary mechanism by which the scholarship database grows and stays current.
+PDFs may be government gazette notifications, university bulletins, NGO announcements, or foundation circulars. They vary enormously in structure, language (English and Hindi), and completeness. DeepSeek-v3.1 is used specifically because of its ability to extract structured fields from unstructured, inconsistently formatted long-form PDFs — outperforming simpler regex or template-based extractors on real-world Indian scholarship documents.
+The pipeline is designed to be idempotent — running it multiple times on the same source PDF produces identical results without creating duplicates. This is enforced through the processed_pdfs tracking collection and the normTitle+normProvider deduplication index on the Scholarship collection.
+User Interaction Flow (Admin/Dev):
+Developer adds new PDF source URL to pipeline configuration file
+         ↓
+Pipeline scheduler runs (cron: daily at 2:00 AM IST)
+         ↓
+For each configured source URL:
+  ├── Download PDF → store temporarily
+  ├── Check processed_pdfs: has this file hash been processed before?
+  │     ├── YES (same hash) → skip (idempotency) → log "Skipped: already processed"
+  │     └── NO (new or changed) → proceed
+  ├── Submit PDF to DeepSeek-v3.1 with extraction prompt
+  ├── DeepSeek returns structured JSON: { title, provider, eligibility, benefit, deadline, restrictions }
+  ├── Validate extracted fields: check for required fields, date format, amount format
+  │     ├── Validation PASS → normalize fields (normTitle, normProvider)
+  │     │     ├── Check deduplication: normTitle+normProvider match existing record?
+  │     │     │     ├── MATCH → update existing record (not insert) → log "Updated: existing"
+  │     │     │     └── NO MATCH → insert new Scholarship record → increment insertedCount
+  │     └── Validation FAIL → log error → mark processed_pdfs status: "Failed"
+  ├── Update processed_pdfs record: status, insertedCount, duplicatesSkipped, processedAt
+  └── Pipeline complete → admin monitor reflects updated stats
+         ↓
+Admin checks /admin/pipeline: sees insertedCount, any failures
+Technical Requirements:
+Language: Python 3.11+
+DeepSeek-v3.1 API integration via REST — structured output mode requested
+Extraction prompt template: versioned JSON, specifying all required output fields with types and examples
+File hash (SHA-256) computed per PDF before processing — stored in processed_pdfs.fileHash
+MongoDB write: insertOne with normTitle+normProvider unique index — duplicate insert raises error, caught and logged as duplicatesSkipped
+Retry logic: failed extraction retried up to 3 times with exponential backoff before marking Failed
+Concurrency: pipeline processes up to 10 PDFs in parallel via async Python (asyncio)
+Logging: structured JSON logs written to log file AND inserted into processed_pdfs per-record
+Scheduler: cron job OR cloud scheduler (AWS EventBridge / GCP Cloud Scheduler)
+Admin trigger: manual re-run available via /admin/pipeline "Retry" button → calls /api/admin/pipeline/retry/{pdfId}
+PDF source config: YAML file with URL list, source name, expected language, check frequency
+Success Criteria:
+Pipeline successfully extracts ≥95% of fields from 100 test PDFs sampled from real Indian scholarship sources
+Idempotency confirmed: running pipeline twice on same PDF produces zero new insertions
+Deduplication catches ≥99% of true duplicates (validated against manually tagged duplicate test set)
+Pipeline completes full run of 500 PDFs within 4 hours
+Admin can view accurate insertedCount and status for every processed PDF within 60 seconds of pipeline completion
+Feature 4.2.2 — Multi-Dimensional Scholarship Schema
+Priority: Must-Have (P0)
+Detailed Description: The Scholarship MongoDB collection is designed as a multi-dimensional record that supports both deterministic filtering and AI ranking. Beyond a simple name-and-amount record, each scholarship document contains granular eligibility constraints (the hard filter fields), structured benefit breakdowns (the ranking fields), normalized identity keys (the deduplication fields), and source metadata (the provenance fields).
+This schema is the foundation that makes ScholarLogic's matching precision possible. A flat schema with just "name, amount, deadline" cannot support the filtering depth required to eliminate genuinely ineligible scholarships or rank by total financial impact.
+Schema Definition:
+javascript
+Scholarship {
+  // Identity
+  _id: ObjectId,
+  title: String,                    // Raw title from source
+  normTitle: String,                // Normalized for deduplication
+  provider: String,                 // Raw provider name
+  normProvider: String,             // Normalized for deduplication
+  
+  // Eligibility — Hard Constraints
+  courseRestriction: [String],      // ["Engineering", "Medical"] or null (no restriction)
+  categoryRestriction: [String],    // ["SC", "ST", "OBC"] or null
+  yearRestriction: [String],        // ["Final Year", "1st Year"] or null
+  educationLevel: [String],         // ["Undergraduate", "Postgraduate"]
+  stateRestriction: [String],       // ["Maharashtra", "Karnataka"] or null
+  incomeCeiling: Number,            // Max annual household income (null = no limit)
+  gpaMinimum: Number,               // Minimum GPA percentage (null = no minimum)
+  
+  // Benefits — Financial Breakdown
+  benefits: {
+    stipend: { amount: Number, frequency: String, durationMonths: Number },
+    tuitionWaiver: { amount: Number, type: String },  // "partial" | "full" | "annual"
+    oneTimeGrant: { amount: Number, purpose: String }
+  },
+  totalAnnualValue: Number,         // Pre-computed for sort
+  
+  // Soft Match Signals
+  targetDemographics: [String],     // ["first-generation", "disability", "minority", "sports"]
+  keywords: [String],               // Extracted keywords for semantic search
+  
+  // Dates & Status
+  deadline: Date,
+  applicationOpenDate: Date,
+  status: String,                   // "active" | "expired" | "upcoming"
+  
+  // Provenance
+  sourceUrl: String,
+  sourcePdfId: ObjectId,            // References processed_pdfs._id
+  extractedBy: String,              // "DeepSeek-v3.1"
+  extractedAt: Date,
+  lastVerified: Date
+}
+```
+**Technical Requirements:**
+- MongoDB compound unique index: `{ normTitle: 1, normProvider: 1 }` — enforces deduplication
+- MongoDB indexes on: `courseRestriction`, `categoryRestriction`, `yearRestriction`, `stateRestriction`, `status`, `deadline` — supports fast filtered queries
+- `totalAnnualValue` computed and stored at write time (not computed on query) for sort performance
+- `normTitle` and `normProvider` generated by a normalization function: lowercase, remove punctuation, expand abbreviations, strip "scheme"/"fund"/"scholarship" suffixes
+- Schema validated by Mongoose schema definition with required fields enforced
+- Migration scripts versioned for any schema evolution
+**Success Criteria:**
+- All 25,000+ scholarships stored with complete required fields (validated by schema enforcement)
+- Deduplication index prevents any exact duplicate across full database
+- Query for "all active Engineering scholarships in Maharashtra under ₹2.5L income ceiling" returns in ≤100ms
+- Schema evolution (adding new fields) does not break existing records or queries
+---
+### Feature 4.2.3 — Deduplication Engine
+**Priority:** Must-Have (P0)
+**Detailed Description:**
+Indian scholarship PDFs are frequently republished across multiple portals, reformatted annually with minor text changes, or re-issued by government departments under slightly different file names. Without a robust deduplication system, the database would rapidly accumulate hundreds of near-identical records that confuse students and inflate match counts with redundant results.
+The deduplication engine operates at two levels. The first level is exact deduplication: the compound unique index on `normTitle` + `normProvider` prevents mathematically identical records from being inserted. The second level is the normalization function that maps surface-level variations to canonical forms before the index check — so "PM Scholarship Scheme 2024" and "Prime Minister Scholarship Scheme, 2024" both normalize to `pmscholarship` + `centralgovernment` and are correctly identified as duplicates.
+**Normalization Function Logic:**
+```
+Input: "PM Scholarship Scheme 2024 - For Central Armed Police Forces"
+Step 1 - Lowercase: "pm scholarship scheme 2024 - for central armed police forces"
+Step 2 - Remove year tokens: "pm scholarship scheme - for central armed police forces"
+Step 3 - Remove stop words (for, the, of, in, under, by): "pm scholarship scheme central armed police forces"
+Step 4 - Remove suffix terms (scheme, fund, scholarship, award, fellowship): "pm central armed police forces"
+Step 5 - Remove punctuation: "pm central armed police forces"
+Step 6 - Expand known abbreviations (PM→primeminister, CAPF→centralarmed policeforces): "primeminister central armed police forces"
+Step 7 - Sort tokens alphabetically and join: "armed central forces minister police prime"
+Output normTitle: "armed central forces minister police prime"
+```
+**Technical Requirements:**
+- Normalization function implemented in Python (pipeline) AND JavaScript (API layer) — both use identical logic
+- Abbreviation expansion dictionary maintained as a JSON file, updated as new scholarship providers encountered
+- Year token removal uses regex: `\b(19|20)\d{2}\b`
+- On duplicate detection (unique index violation): pipeline logs `duplicatesSkipped++`, updates `lastVerified` on existing record, does NOT create new record
+- Admin UI shows `duplicatesSkipped` count per PDF in pipeline monitor
+- Periodic deduplication audit job: weekly scan using fuzzy string matching (Levenshtein distance ≤3) to catch near-duplicates that passed normalization — flags for human review
+**Success Criteria:**
+- Manual test of 50 known duplicate pairs: normalization correctly identifies ≥48 as duplicates
+- Zero duplicate scholarships visible to students in match list
+- `duplicatesSkipped` count accurately reported in admin pipeline monitor
+- Weekly fuzzy audit flags ≤5% false positives (legitimate non-duplicates flagged)
+---
+## 4.3 — STUDENT DATA CONTRACT (USER PROFILE)
+---
+### Feature 4.3.1 — Comprehensive Profile Builder (4-Step Onboarding)
+**Priority:** Must-Have (P0)
+**Detailed Description:**
+The Student Data Contract is the single most important data input in the platform. Every AI matching decision, every SOP generated, and every AI Assistant response is powered by the richness of this profile. The profile builder is designed as a 4-step guided wizard shown immediately after signup (onboarding) and accessible at any time from the Profile page in the dashboard.
+The four steps are sequenced by increasing intimacy and sensitivity of information — starting with non-sensitive educational basics and ending with financial details. Each step shows only its own fields, with a clear progress indicator. Partial completion is acceptable — the system matches on whatever is available and displays a "profile completion score" showing how many more scholarships would unlock with complete data.
+**Step Breakdown:**
+Step 1 — Personal Information: Full Name, Email (pre-filled from Clerk), Phone, Date of Birth, Gender, Nationality. All basic, non-sensitive, quick to complete. Estimated time: 90 seconds.
+Step 2 — Education Details: Education Level (select), University/Institution (text), Course/Major (text + tag suggestions), Year of Study (select), GPA/Percentage (numeric), Expected Graduation (month/year picker), Areas of Interest (multi-tag). Estimated time: 2 minutes.
+Step 3 — Demographics: State of Residency (select), District (text), First-Generation Learner (toggle with brief explainer tooltip), Minority Community (toggle, if ON: community name), Disability Status (toggle, if ON: type select + disability percentage + certificate availability toggle), Category/Caste (select: General/SC/ST/OBC/EWS). Estimated time: 2 minutes.
+Step 4 — Financial Details: Annual Household Income (bracket select), Income Certificate Available (toggle), BPL Card Holder (toggle), Bank Account Linked (toggle, if ON: masked account field). Estimated time: 60 seconds.
+**User Interaction Flow:**
+```
+New student completes signup → redirected to /onboarding
+         ↓
+Progress bar shows: Step 1 of 4 (Personal)
+Student fills fields → "Continue" button activates when required fields complete
+         ↓
+Step 2 (Education) → Student types "Comp" in Course field
+Auto-suggestions appear: "Computer Science", "Computer Engineering", "Computer Applications"
+Student selects "Computer Science" → tag added
+         ↓
+Step 3 (Demographics) → Student toggles "Disability Status" ON
+Additional fields slide down: "Type of Disability" select, "Disability Percentage" number, "Certificate Available" toggle
+Student completes disability details
+         ↓
+Step 4 (Financial) → Student selects "₹1L–₹2.5L" income bracket
+         ↓
+"Complete Profile" button → profile saved to MongoDB User collection
+         ↓
+System triggers async match calculation
+         ↓
+Student redirected to /dashboard with "Your matches are calculating..." state
+         ↓
+Within 60 seconds: "27 scholarships matched!" notification
+```
+**Technical Requirements:**
+- Clerk's `userId` (clerkId) used as primary key for User document
+- Multi-step form state managed in React `useState` — no data saved until step completion or explicit save
+- "Save & Continue" also saves partial data — student can exit and resume
+- Auto-save: partial form data persisted to localStorage every 30 seconds as backup
+- Course field: typeahead suggestions from a curated course list (500+ entries) stored as static JSON
+- Disability type options: Visual Impairment, Hearing Impairment, Locomotor Disability, Intellectual Disability, Multiple Disabilities, Other
+- Conditional field reveal: `disability.toggle ON` → animate-in disability detail fields using `max-height` CSS transition
+- All form inputs validated client-side before "Continue" — error states show inline below field
+- Profile saved via `PATCH /api/user/profile` — partial updates supported (not full replacement)
+- Profile completion score computed server-side: weighted sum of filled fields (disability/first-gen weight higher than name)
+**Success Criteria:**
+- ≥80% of new users who start onboarding complete all 4 steps
+- Average onboarding completion time ≤8 minutes
+- Profile saved successfully with zero data loss in ≥99.9% of submissions
+- Auto-save prevents data loss on accidental browser close (validated in testing)
+- Conditional field reveal (disability, minority) works correctly on all major browsers
+---
+### Feature 4.3.2 — Profile Completion Score & Match Impact Preview
+**Priority:** Should-Have (P1)
+**Detailed Description:**
+Students need clear motivation to invest time in completing a detailed profile. The Profile Completion Score (displayed as a circular percentage ring in the profile page header) and the Match Impact Preview (a bar chart showing which fields unlock the most scholarships) are the primary gamification and motivation mechanisms.
+The completion score is a weighted percentage — fields with higher matching impact (disability status, first-gen, category) are weighted more heavily than lower-impact fields (phone number, areas of interest). This weighting means a student with only 6 fields filled can still have a 72% completion score if those 6 fields are the highest-impact ones.
+The Match Impact Preview is a real-time visualization showing how each field in the student's profile contributes to their match count. It answers the question: "If I fill in my disability certificate details, how many more scholarships would I match?" This is computed by running a sensitivity analysis — toggling each empty field to a hypothetical value and measuring match count delta.
+**User Interaction Flow:**
+```
+Student opens /dashboard/profile
+         ↓
+Header shows: circular ring "72% Complete" in violet
+Below: "Add 3 more details to reach 100%"
+         ↓
+Right sidebar shows Profile Checklist:
+  ✅ Personal Info (complete)
+  ✅ Education Details (complete)
+  ✅ State & Residency (complete)
+  ⬜ Disability Certificate — "Add this to unlock 8 more scholarships"
+  ⬜ Income Bracket — "Add this to unlock 5 more scholarships"
+  ⬜ Areas of Interest — "Add this to unlock 3 more scholarships"
+         ↓
+Student clicks "Disability Certificate" checklist item
+         ↓
+Page scrolls to Demographics section, Disability Certificate field highlighted with pulse animation
+         ↓
+Student fills in disability details → saves
+         ↓
+Completion score animates from 72% to 86%
+Checklist item turns ✅
+Match recalculation triggered
+         ↓
+Match Impact Preview bars update to reflect new profile completeness
+```
+**Technical Requirements:**
+- Completion score: weighted field checklist stored as config (field name → weight value) — sum of weights for completed fields / total weight = score
+- Score computed server-side on every profile save, stored as `user.profileCompletionScore`
+- "Unlock X more scholarships" estimate: computed by server-side sensitivity analysis at profile save time — stored as `user.fieldImpactEstimates: { disability: 8, income: 5, areasOfInterest: 3 }`
+- Match Impact bars: animated CSS width transitions (0 → target %) on page load
+- Checklist click → smooth scroll + highlight: CSS `scroll-behavior: smooth`, target field gets 2s pulse animation (`box-shadow: 0 0 0 3px rgba(123,92,250,0.5)` keyframe)
+- Score ring: CSS `conic-gradient` updated dynamically when score changes
+- Score animation: GSAP or CSS `@property` counter animation from old value to new value
+**Success Criteria:**
+- Profile completion score accurately reflects weighted field completion in ≥99% of cases
+- "Unlock X more scholarships" estimates are within ±2 of actual new matches unlocked (validated by testing)
+- ≥45% of users who see incomplete checklist items fill in at least one additional field within the same session
+- Score ring animation plays correctly on all target browsers
+---
+## 4.4 — DOCUMENT VAULT
+---
+### Feature 4.4.1 — Cloudinary-Backed Document Storage
+**Priority:** Must-Have (P0)
+**Detailed Description:**
+The Document Vault provides students with a centralized, persistent store for all certificates, transcripts, and supporting documents needed across multiple scholarship applications. Rather than re-uploading the same income certificate to every individual scholarship portal, students upload once to ScholarLogic and reference the stored document across all applications.
+Documents are stored on Cloudinary with signed upload URLs (preventing direct client-to-Cloudinary uploads without server authorization). Each document record in the User schema stores the Cloudinary `publicId` (enabling direct URL construction for preview/download) and `uploadedAt` timestamp. Documents are categorized by type on upload and displayed in the vault organized by category.
+**User Interaction Flow:**
+```
+Student clicks "Upload New Document" button
+         ↓
+Upload modal opens
+         ↓
+Student selects document type from dropdown:
+  (Income Proof / Resume / Marksheet / Disability Certificate / 
+   Recommendation Letter / Caste Certificate / Other)
+         ↓
+Student drags PDF file into drag zone OR clicks "Browse Files"
+         ↓
+Client validates: file type (PDF/JPG/PNG only) + file size (≤5MB)
+  ├── Invalid type → "Only PDF, JPG, and PNG files are supported" error
+  └── Size exceeded → "File must be under 5MB. Yours is 7.2MB." error
+         ↓
+Valid file → client requests signed upload URL from server
+Server generates Cloudinary signed URL with 5-minute expiry
+         ↓
+Client uploads directly to Cloudinary using signed URL
+Progress bar animates from 0% to 100% inside drag zone
+         ↓
+Cloudinary returns publicId and secure_url
+Client sends publicId + document type + uploadedAt to server
+Server appends to user.documents array in MongoDB
+         ↓
+Modal closes, vault grid updates to show new uploaded card
+"Document uploaded successfully" green toast notification
+```
+**Technical Requirements:**
+- Cloudinary Node.js SDK for signed URL generation on server
+- Client-to-Cloudinary direct upload using signed URL (server never handles file binary)
+- `User.documents` schema: `[{ type: String, publicId: String, secureUrl: String, uploadedAt: Date, fileName: String, fileSize: Number, mimeType: String }]`
+- File type validation: client-side (MIME type check) AND server-side (re-validate before signing URL)
+- File size validation: client-side check before any upload attempt
+- Storage limit enforcement: Free plan 10 files / Scholar 50 files / Pro 200 files — checked server-side before generating signed URL
+- File preview: Cloudinary URL constructed from publicId with `/fl_attachment` flag for download, standard URL for in-browser PDF preview (iframe) or image preview (img)
+- Deletion: Cloudinary deletion via Admin API + MongoDB document array pull in single transaction
+- Replace: delete existing publicId from Cloudinary, upload new, update MongoDB array entry
+**Success Criteria:**
+- File upload succeeds in ≥99.5% of attempts for files meeting format and size requirements
+- Upload progress bar accurately reflects upload state
+- Invalid file types rejected at client-side before any network request
+- Documents persist across sessions and browser refreshes
+- File preview loads within 3 seconds for PDFs under 5MB
+- Zero files stored without corresponding MongoDB record (transactional integrity)
+---
+## 4.5 — APPLICATION TRACKER
+---
+### Feature 4.5.1 — Application Status Pipeline
+**Priority:** Must-Have (P0)
+**Detailed Description:**
+The Application Tracker gives students full visibility into their scholarship application lifecycle across a clearly defined status pipeline: Saved → Applied → Under Review → Won / Rejected. Each status transition is student-initiated (students manually update status) except for potential future webhook integrations with scholarship portals.
+The `Application` MongoDB collection acts as the bridge between students and scholarships, with a strict compound unique index on `{clerkId, scholarshipId}` preventing any student from submitting duplicate applications to the same scholarship. This deduplication is enforced at the database level, not just the UI level.
+**User Interaction Flow:**
+```
+Student on My Matches page clicks bookmark icon on scholarship card
+         ↓
+Application record created: { clerkId, scholarshipId, status: "Saved", savedAt: Date }
+Badge "14 Saved" updates on dashboard stat card
+         ↓
+Student clicks "Apply Now" on the same scholarship card
+         ↓
+System checks: Application record exists (status: Saved)
+Status updated: "Applied", appliedAt: Date recorded
+Application moves to "Applied" column in tracker
+         ↓
+Student logs in 2 weeks later, opens /dashboard/applications
+         ↓
+Student clicks three-dot menu on "Tata Trust Medical Grant" row
+Selects "Mark as Under Review"
+         ↓
+Status updated: "Under Review", updatedAt: Date
+Row badge changes to blue "Under Review" pill
+         ↓
+Student receives scholarship result (external communication)
+Returns to platform, opens application detail slide-over
+Clicks "Mark as Won"
+         ↓
+Status updated: "Won", wonAt: Date
+         ↓
+"Won" card appears in green column in Kanban view
+Dashboard "Won" stat card increments to 2
+```
+**Technical Requirements:**
+- `Application` schema: `{ clerkId: String, scholarshipId: ObjectId, status: String, savedAt: Date, appliedAt: Date, reviewedAt: Date, wonAt: Date, rejectedAt: Date, withdrawnAt: Date, updatedAt: Date }`
+- Compound unique index: `{ clerkId: 1, scholarshipId: 1 }` — `unique: true` enforced at MongoDB level
+- Duplicate application attempt: MongoDB unique index error caught server-side → 409 Conflict response → UI shows "Already saved/applied" toast
+- Status transition validation: enforce forward-only transitions (Saved → Applied → Under Review → Won/Rejected) — prevent invalid jumps (e.g., cannot go from Won back to Saved)
+- All status timestamps recorded independently (not just updatedAt)
+- Application count denormalized into User document (`user.applicationCounts: { saved, applied, underReview, won, rejected }`) for O(1) stat card queries — updated atomically with status change
+**Success Criteria:**
+- Zero duplicate Application records exist in production database (verified by periodic unique index audit)
+- Status transitions complete within 500ms of student action
+- All 5 status types display with correct color-coded pills
+- Application count stat cards on dashboard reflect accurate real-time counts
+- Withdrawal flow removes scholarship from active tracking without deleting historical record
+---
+## 4.6 — AI SOP GENERATOR
+---
+### Feature 4.6.1 — Profile-Contextual SOP Generation
+**Priority:** Must-Have (P0)
+**Detailed Description:**
+The SOP Generator is the platform's highest-value feature for students who have identified matching scholarships and need to convert matches into applications. It uses Gemini-2.5-Flash to produce a personalized, scholarship-specific Statement of Purpose by combining two data inputs: the student's complete profile (the Student Data Contract) and the selected scholarship's eligibility criteria, mission statement, and target demographic.
+The generated SOP is not a generic template with name-filled placeholders. It is a contextually aware narrative that references the student's specific circumstances — their first-generation status, their disability journey, their state's educational challenges, their GPA in the context of their financial constraints — and aligns these circumstances with the scholarship provider's mission.
+The output is displayed in an editable `contenteditable` div, allowing students to refine, personalize further, and correct any AI errors before saving or submitting.
+**User Interaction Flow:**
+```
+Student selects "PM Scholarship Scheme" from dropdown in left control panel
+         ↓
+Mini scholarship info card appears below dropdown:
+Provider: Central Armed Police Forces | Benefit: ₹3,000/mo | Match: 96%
+         ↓
+Profile context section shows student's data that will be used:
+Name: Priya K. | Education: Undergraduate CS, 2nd Year | GPA: 78%
+State: Maharashtra | First-Gen: Yes | Disability: Yes (Visual, 40%) | Income: Below ₹2.5L
+         ↓
+Student selects Tone: "Warm & Personal" | Length: "Medium (400 words)"
+         ↓
+Clicks "Generate SOP" (sparkle icon + primary button)
+         ↓
+Button shows spinner + "Generating..." — output panel shows skeleton loading state
+         ↓
+Gemini-2.5-Flash receives structured prompt:
+  - Student profile JSON
+  - Scholarship details (mission, target demographic, eligibility)
+  - Tone instruction (warm, personal, avoid corporate language)
+  - Length instruction (350-450 words)
+  - Output instruction (plain paragraphs, no headers, no bullet points)
+         ↓
+Response streams into output panel (word-by-word streaming if API supports SSE)
+         ↓
+Full SOP displayed in editable area:
+  Para 1: "Growing up as the first in my family to pursue higher education in rural Maharashtra..."
+  Para 2: "Despite facing visual impairment, I have maintained 78% in Computer Science..."
+  Para 3: "My family's annual income of below ₹2.5 lakhs has meant that..."
+  Para 4: "The PM Scholarship Scheme's commitment to supporting students from CAPF families..."
+  Para 5: "I am committed to giving back to my community by..."
+         ↓
+Word count: 387 words | "AI-generated · Always review before submitting"
+         ↓
+Student edits paragraph 2 — changes specific wording
+         ↓
+Clicks "Save Draft" → saved as { userId, scholarshipId, content, savedAt, wordCount }
+Clicks "Export PDF" → Cloudinary or server-side PDF generation → download
+```
+**Technical Requirements:**
+- Gemini-2.5-Flash API: `generateContent` with structured system prompt + user prompt combining profile + scholarship data
+- SSE (Server-Sent Events) for streaming response to client — word-by-word display using `ReadableStream`
+- Prompt template versioned — stored in database, not hardcoded
+- Tone mapping: "Professional" → formal register, active voice, achievement-focused; "Warm & Personal" → first-person narrative, emotional context, community focus; "Concise" → short sentences, factual, no embellishment
+- Length enforcement: prompt includes hard word count instruction — Gemini instructed to stop at target ±50 words
+- SOP saved as: `{ _id, userId, scholarshipId, scholarshipName, content, tone, lengthTarget, wordCount, savedAt, version }`
+- Export PDF: server-side using `puppeteer` or `pdfkit` — apply basic formatting (margins, font, scholarship name header)
+- `contenteditable` area: paste handling strips HTML formatting, preserves plain text only
+- Live word count: `input` event listener on `contenteditable` div → word count badge updates in real-time
+**Success Criteria:**
+- Generated SOPs reference at least 3 specific student profile details (validated by automated string matching test)
+- Generated SOPs reference the specific scholarship name and provider (validated by automated test)
+- SOP word count within ±15% of selected length target
+- SOP generation completes in ≤30 seconds for all length options
+- Students rate generated SOPs ≥4.0/5 on post-generation quality prompt
+- Save draft succeeds in ≥99.9% of attempts
+- PDF export produces correctly formatted document matching screen content
+---
+## 4.7 — AI ASSISTANT (SCHOLARBOT)
+---
+### Feature 4.7.1 — Profile-Aware Conversational AI
+**Priority:** Should-Have (P1)
+**Detailed Description:**
+ScholarBot is a conversational AI interface powered by Gemini-2.5-Flash that has full awareness of the student's profile and current match list. Unlike a generic chatbot, ScholarBot can answer scholarship-specific questions with precision — it knows Priya's exact profile, her 27 matched scholarships, her application statuses, and her uploaded documents. It uses this context to give answers that are immediately actionable rather than generic.
+Every conversation session begins with a system context injection containing the student's full profile JSON, their top 10 matched scholarships, and their application status summary. This context enables responses like "You have 3 deadlines in October — PM Scholarship on the 15th, ISHAN on the 22nd, and Tata Trust on the 31st" rather than generic "Check your scholarship deadlines" responses.
+**User Interaction Flow:**
+```
+Student opens /dashboard/assistant
+         ↓
+AI sends opening message:
+"Hello Priya! I'm ScholarBot, your scholarship AI. I can see you have 27 matches, 
+8 applications submitted, and your next deadline is PM Scholarship on 15 Oct 2025. 
+What would you like to explore today?"
+         ↓
+Student clicks suggested prompt: "Which scholarships match my disability status?"
+         ↓
+Prompt sent to Gemini with full context
+         ↓
+AI responds:
+"Based on your visual impairment (40%) and disability certificate, I found 6 scholarships 
+specifically targeting students with disabilities:"
+[3 embedded scholarship mini-cards rendered inside chat bubble:
+  Card 1: NHFDC Scholarship | ₹12,000/year | 89% Match | [View →]
+  Card 2: AIIMS Disability Grant | ₹8,000 one-time | 82% Match | [View →]
+  Card 3: State Disability Board Award | ₹6,000/year | 78% Match | [View →]
+]
+"Would you like me to generate SOPs for any of these?"
+         ↓
+Student: "Yes, for the NHFDC one"
+         ↓
+AI: "I'll take you to the SOP Generator with NHFDC pre-selected. [Open SOP Generator →]"
+Link navigates to /dashboard/sop with scholarshipId pre-filled in query param
+```
+**Technical Requirements:**
+- System prompt injected per session: student profile JSON + top 10 match list + application status summary
+- Context window management: conversation history included in each API call (up to last 10 messages) — older messages summarized if context limit approached
+- Embedded scholarship card rendering: AI returns structured JSON alongside text when scholarship cards are appropriate — client parses and renders cards
+- Response format: AI instructed to return hybrid `{ text: String, cards: [ScholarshipCard] | null }` — client renders text and optional cards separately
+- Suggested prompt chips: static list stored in frontend config, sent to AI as if typed by user on click
+- Session persistence: conversation stored in React state (not database in v1.0) — cleared on page reload
+- Typing indicator: shown while awaiting Gemini response — 3 animated dots
+- "Open SOP Generator →" and "View →" deep links: client-side navigation with pre-filled query params
+**Success Criteria:**
+- AI responses reference specific student profile data in ≥90% of profile-relevant queries (validated by test query set)
+- Scholarship card rendering works correctly in ≥99% of responses that include card data
+- Suggested prompt clicks produce contextually relevant responses in ≥95% of cases
+- Response time ≤8 seconds for text-only responses, ≤12 seconds for responses with card data
+- ≥70% of users who open AI Assistant send at least 3 messages in the same session
+---
+## 4.8 — ADMIN PIPELINE MONITOR
+---
+### Feature 4.8.1 — PDF Status Table & Live Log Feed
+**Priority:** Must-Have (P0) for table, Should-Have (P1) for live log
+**Detailed Description:**
+The Pipeline Monitor is the developer-facing operational dashboard that provides full visibility into the health and output of the PDF ingestion pipeline. It is the primary debugging and auditing tool for the platform's data operations team. Without it, pipeline failures are invisible until students report missing scholarships — with it, failures are detected and resolved within minutes of occurrence.
+The status table shows every PDF the pipeline has ever processed, with current status, extraction metrics, and the ability to trigger retries for failed records. The live log feed provides a real-time terminal-style view of the pipeline's output — identical to watching `tail -f pipeline.log` but rendered in a polished UI with color-coded severity levels.
+**User Interaction Flow:**
+```
+Admin signs in → redirected to /admin/pipeline
+         ↓
+Sees 4-stat summary: 1,284 PDFs | 18,640 Scholarships | 312 Duplicates Skipped | 7 Failed
+         ↓
+Admin notices "7 Failed" in red
+         ↓
+Clicks Status column header → sorts by Status ascending → Failed records surface first
+         ↓
+Clicks "View Details" on first failed record
+         ↓
+Modal opens: sourceFile: "rajasthan_merit_2025.pdf" | extractedFields: 2 | 
+insertedCount: 0 | status: Failed | error: "Required field 'deadline' not found in extraction"
+         ↓
+Admin identifies issue: PDF had deadline in image format (not parseable text)
+Admin sources text-based version of PDF, re-uploads to source bucket
+         ↓
+Clicks "Retry Extraction" button in modal
+         ↓
+Pipeline job queued → modal shows "Retry queued" confirmation
+         ↓
+Admin watches live log feed:
+[09:41:22 IST] INFO  — Retry triggered: rajasthan_merit_2025_v2.pdf
+[09:41:23 IST] INFO  — DeepSeek-v3.1 extraction started
+[09:41:31 IST] INFO  — Extracted 16 fields successfully
+[09:41:31 IST] INFO  — insertedCount: 11 | duplicatesSkipped: 2
+[09:41:31 IST] INFO  — Status updated: Complete
+         ↓
+Table row updates: Failed → Complete, insertedCount: 11
+Failed Extractions stat card decrements from 7 to 6
+```
+**Technical Requirements:**
+- `processed_pdfs` collection queried with pagination: `GET /api/admin/pipeline?page=1&limit=25&status=Failed&sort=processedAt:desc`
+- Retry endpoint: `POST /api/admin/pipeline/retry/{pdfId}` — admin auth required (Clerk role check)
+- Live log feed: Server-Sent Events (`/api/admin/pipeline/logs/stream`) — server pushes new log entries as they're written
+- Log entries: structured JSON `{ timestamp, level, message, pdfId, insertedCount }` → client formats into colored terminal display
+- Log levels color map: INFO `#4ADE80`, WARN `#FACC15`, ERROR `#F87171`, DEBUG `#9A98B0`
+- Auth gate: middleware checks Clerk user has `admin` role metadata — non-admins receive 403 redirect
+- Table pagination: server-side, 25 rows per page, total count in response header
+- Export: `GET /api/admin/pipeline/export?format=csv` → streams CSV with all processed_pdfs fields
+- 7-day chart: aggregate query `GROUP BY DATE(processedAt), COUNT(insertedCount)` → cached for 1 hour
+**Success Criteria:**
+- Status table loads within 2 seconds for 1,284 records
+- Live log feed displays new log entries within 3 seconds of pipeline writing them
+- "Retry Extraction" successfully re-queues failed job in ≥99% of attempts
+- Admin auth gate blocks all non-admin access — confirmed by penetration testing
+- Export CSV contains accurate data for all processed_pdfs records
+- Table filters (Status, sort by column) work correctly for all filter combinations
+---
+## 4.9 — AUTHENTICATION & SECURITY
+---
+### Feature 4.9.1 — Clerk Authentication Suite
+**Priority:** Must-Have (P0)
+**Detailed Description:**
+All authentication — session management, token issuance, OAuth flows, email verification, and password reset — is delegated to Clerk. ScholarLogic does not store passwords or manage auth tokens directly. Clerk's `userId` (referred to throughout as `clerkId`) becomes the primary identifier linking the Clerk user record to the MongoDB User document and all Application records.
+This architecture ensures ScholarLogic never handles password data, significantly reducing security surface area, and provides built-in protection against brute force attacks, session fixation, and credential stuffing through Clerk's infrastructure.
+**User Interaction Flow:**
+```
+New user clicks "Continue with Google" on /signup
+         ↓
+Clerk OAuth flow: redirect to Google → user authenticates → Google returns to Clerk
+         ↓
+Clerk creates user record, generates clerkId (e.g., "user_2abc123xyz")
+         ↓
+Clerk session cookie set in browser
+         ↓
+ScholarLogic webhook receives "user.created" event from Clerk
+         ↓
+Server creates MongoDB User document: { clerkId: "user_2abc123xyz", email: "...", createdAt: Date }
+         ↓
+User redirected to /onboarding
+         ↓
+Subsequent page loads: Clerk SDK validates session token → returns clerkId to server
+         ↓
+All API calls include clerkId in auth header → server authorizes against MongoDB User record
+Technical Requirements:
+Clerk Next.js SDK (or React SDK) — <ClerkProvider> wrapping entire app
+useUser() hook provides clerkId client-side without additional API call
+Server-side: getAuth(req) from @clerk/nextjs/server for API route authentication
+Admin role: Clerk user metadata { role: "admin" } — checked on all /api/admin/* routes
+Protected routes: Next.js middleware using authMiddleware from Clerk — redirects unauthenticated users to /signin
+Webhook: Clerk user.created webhook → server creates MongoDB User document (idempotent — check for existing before insert)
+Password strength: Clerk enforces minimum password requirements — ScholarLogic UI shows visual strength meter as additional UX layer
+Email verification: Clerk handles delivery and verification link — ScholarLogic checks user.emailAddresses[0].verification.status === "verified" before allowing dashboard access
+Success Criteria:
+Zero authentication bypasses in penetration testing
+Session persistence works across browser close and reopen (Clerk's default behavior)
+Google OAuth flow completes in ≤5 seconds on standard connection
+Unauthenticated access attempts to any /dashboard/* route result in redirect to /signin in 100% of test cases
+Admin-only routes block non-admin Clerk sessions in 100% of test cases
+Webhook creates MongoDB User document within 5 seconds of Clerk user creation in ≥99.9% of cases
+SECTION 5 — USER JOURNEY MAPPING
+5.1 Journey 1 — New Student (Discovery to First Match)
+AWARENESS
+│
+├─ Finds ScholarLogic via Google search ("scholarship for first generation students India")
+│   OR social media / college WhatsApp group referral
+│
+▼
+LANDING PAGE (/)
+│
+├─ Reads hero: "Find Scholarships You Actually Qualify For"
+├─ Sees 3-step process (Build Profile → AI Matches → Apply with SOP)
+├─ Checks stats: 12,000+ scholarships, 94% accuracy
+├─ Clicks "Get Started Free"
+│
+▼
+SIGN UP (/signup)
+│
+├─ Chooses Google SSO (most common) OR email/password
+├─ Completes: Full Name, Email, Education Level, State
+├─ Verifies email
+│
+▼
+ONBOARDING WIZARD (/onboarding)
+│
+├─ Step 1: Education details (course, year, GPA)
+├─ Step 2: Demographics (first-gen toggle, disability toggle, category)
+├─ Step 3: Financial (income bracket)
+├─ Step 4: Upload first document (optional, skip available)
+│
+▼
+DASHBOARD OVERVIEW (/dashboard)
+│
+├─ Sees: "27 scholarships matched to your profile"
+├─ Sees Top Match card: "PM Scholarship Scheme — 96% Match — ₹3,000/month"
+├─ Sees stat: "₹2.4L Potential Total Aid"
+├─ ✅ AHA MOMENT: Immediate value visible within 3 minutes of signup
+│
+▼
+MY MATCHES (/dashboard/matches)
+│
+├─ Browses match cards, filters by "Stipend" type
+├─ Saves 3 scholarships (bookmark)
+├─ Clicks "Apply Now" on top match
+│
+▼
+SOP GENERATOR (/dashboard/sop)
+│
+├─ PM Scholarship pre-selected from application flow
+├─ Profile context auto-populated
+├─ Selects tone: "Warm & Personal", length: Medium
+├─ Clicks "Generate SOP" → reads output
+├─ Makes minor edits in contenteditable area
+├─ Clicks "Save Draft"
+│
+▼
+DOCUMENT VAULT (/dashboard/vault)
+│
+├─ Prompted to upload Income Proof (required for this scholarship)
+├─ Uploads PDF via drag-and-drop
+├─ Vault shows "4 of 10 files" used
+│
+▼
+APPLICATION SUBMITTED
+│
+├─ Application status set to "Applied" in tracker
+├─ Application appears in Kanban "Applied" column
+│
+▼
+RETURN VISITS
+│
+├─ Checks application status updates
+├─ Asks AI Assistant "When is my next deadline?"
+├─ Receives email notification when status changes
+│
+▼
+CONVERSION TRIGGER (Month 1–2)
+│
+├─ Hits free tier limit (10 matches/mo or 1 SOP)
+├─ Prompted to upgrade to Scholar plan
+├─ Converts at ₹749/month
+5.2 Journey 2 — Returning Student (Application Management)
+RETURNING USER
+│
+├─ Signs in via Google SSO (remembers credentials)
+│
+▼
+DASHBOARD OVERVIEW
+│
+├─ Sees "+2 new" badge on Scholarship Matches card
+├─ Sees "Application Submitted" in Recent Activity
+│
+▼
+APPLICATIONS (/dashboard/applications)
+│
+├─ Switches to Kanban view
+├─ Drags "Tata Trust Medical Grant" from Applied → Under Review
+├─ Opens detail slide-over: reads milestone timeline
+│
+▼
+AI ASSISTANT (/dashboard/assistant)
+│
+├─ Types: "Am I eligible for government scholarships?"
+├─ AI responds with 3 matched government schemes + eligibility reasoning
+├─ Clicks "View" on embedded scholarship card → redirected to match detail
+│
+▼
+PROFILE UPDATE
+│
+├─ Goes to Profile, updates GPA from 78% to 82%
+├─ Match list re-calculates → 31 matches (was 27)
+├─ New top match surfaces
+5.3 Journey 3 — Admin Operator (Pipeline Monitoring)
+ADMIN LOGIN
+│
+├─ Signs in with admin credentials
+├─ Redirected to /admin/pipeline (not student dashboard)
+│
+▼
+PIPELINE MONITOR (/admin/pipeline)
+│
+├─ Scans 4-stat cards: 1,284 PDFs / 18,640 inserted / 312 duplicates / 7 failed
+├─ Notices "7 Failed Extractions" in danger red
+│
+▼
+INVESTIGATE FAILURES
+│
+├─ Filters table by Status: "Failed"
+├─ Clicks "View Details" on failed PDF
+├─ Modal shows: extractedFields: 3 (incomplete), duplicatesSkipped: 0
+├─ Identifies source PDF was corrupted / password-protected
+├─ Clicks "Retry Extraction" after sourcing clean PDF
+│
+▼
+LOG MONITORING
+│
+├─ Watches live log feed for retry result
+├─ Sees: "[INFO] Processing: national_merit_2025_v2.pdf"
+├─ Sees: "[INFO] insertedCount: 12 | duplicatesSkipped: 2"
+├─ Status updates to Complete in table
+│
+▼
+REPORTING
+│
+├─ Views 7-day bar chart — daily insertions trending up
+├─ Clicks "Export Log" → downloads CSV for weekly report
+5.4 Journey 4 — Pricing Page Conversion
+PUBLIC VISITOR (not signed up)
+│
+├─ Clicks "Pricing" in navbar
+│
+▼
+PRICING PAGE (/pricing)
+│
+├─ Reads Free tier: 10 matches/mo, 1 SOP
+├─ Reads Scholar tier: Unlimited matches, 10 SOPs — ₹749/mo
+├─ Toggles to Annual: ₹624/mo (saves 17%)
+├─ Reads comparison table — "SOP Refinement" only in Pro
+├─ Reads FAQ: "Is my document data secure?"
+│
+▼
+DECISION POINT
+│
+├─ Path A: Clicks "Get Started Free" → Sign Up journey (5.1)
+├─ Path B: Clicks "Scholar Plan" → Sign Up → lands on dashboard → prompted to add payment
+│
+▼
+FREE TRIAL EXPERIENCE
+│
+├─ Uses platform for 2–3 weeks
+├─ Hits match limit on Day 18
+├─ Upgrade prompt appears: "You've seen 10 of 27 matches. Upgrade to Scholar to unlock all."
+├─ Converts to Scholar
+SECTION 6 — SUCCESS METRICS
+6.1 Acquisition Metrics
+Metric
+Definition
+Target (Month 6)
+Measurement Tool
+Monthly Unique Visitors
+Unique sessions to public pages
+50,000
+Google Analytics
+Sign-up Conversion Rate
+Visitors → registered accounts
+≥8%
+Analytics funnel
+Sign-up Source Breakdown
+Google / Social / Referral / Direct
+Track all
+UTM parameters
+Cost Per Acquisition
+Marketing spend / new signup
+≤₹200
+Ad platform + Analytics
+Organic Search Traffic
+Sessions from non-paid search
+60% of total
+Google Search Console
+6.2 Activation Metrics
+Metric
+Definition
+Target
+Measurement
+Profile Completion Rate
+% users who complete all 4 profile steps
+≥75%
+Database query
+Time to First Match
+Minutes from signup to viewing match list
+≤5 min
+Event tracking
+Onboarding Completion Rate
+% users who finish onboarding wizard
+≥80%
+Funnel analytics
+First Document Upload Rate
+% users who upload ≥1 document within 7 days
+≥45%
+Event tracking
+AHA Moment Rate
+% users who view their Top Match card
+≥90%
+Event tracking
+6.3 Engagement Metrics
+Metric
+Definition
+Target
+Measurement
+DAU / MAU Ratio
+Daily active / Monthly active users
+≥25% (sticky)
+Analytics
+Matches Saved per Session
+Avg scholarships bookmarked per visit
+≥3
+Event tracking
+SOP Generation Rate
+% active users who generate ≥1 SOP
+≥60%
+Database query
+AI Assistant Sessions
+% users who use ScholarBot per week
+≥30%
+Event tracking
+Document Vault Utilization
+Avg documents uploaded per user
+≥3
+Database query
+Applications Submitted
+Avg per active user per month
+≥2
+Application collection
+Session Duration
+Average time on platform per visit
+≥8 min
+Analytics
+6.4 Retention Metrics
+Metric
+Definition
+Target
+Measurement
+Day 7 Retention
+% users who return within 7 days
+≥50%
+Cohort analysis
+Day 30 Retention
+% users who return within 30 days
+≥30%
+Cohort analysis
+Month 3 Retention
+% users active 3 months after signup
+≥20%
+Cohort analysis
+Profile Update Rate
+% users who update profile ≥once/month
+≥40%
+Event tracking
+Application Status Update Rate
+% users who update application statuses
+≥55%
+Database query
+6.5 Revenue Metrics
+Metric
+Definition
+Target (Month 6)
+Measurement
+Free-to-Paid Conversion Rate
+% free users who upgrade
+≥15%
+Stripe / payment logs
+Monthly Recurring Revenue (MRR)
+Total paid subscription revenue/month
+₹5,00,000
+Payment platform
+Average Revenue Per User (ARPU)
+MRR / total paid users
+≥₹900
+Calculated
+Churn Rate
+% paid users who cancel/month
+≤5%
+Payment platform
+Annual Plan Adoption
+% paid users on annual vs monthly
+≥35%
+Payment platform
+6.6 Platform Quality Metrics
+Metric
+Definition
+Target
+Measurement
+Match Accuracy Rate
+% matched scholarships where student is genuinely eligible
+≥92%
+Manual audit sample
+Pipeline Uptime
+% time PDF ingestion pipeline is operational
+≥99.5%
+Monitoring (Datadog/similar)
+PDF Extraction Success Rate
+% PDFs successfully extracted without failure
+≥97%
+processed_pdfs collection
+Duplicate Rejection Accuracy
+% of true duplicates caught by normTitle/normProvider
+≥99%
+Database audit
+SOP Quality Score
+User-rated SOP quality (1–5 scale)
+≥4.2/5
+In-app rating
+Page Load Speed
+Core Web Vitals — LCP
+≤2.5s
+Google Lighthouse
+Scholarship DB Freshness
+% scholarships with deadline updated within 30 days
+≥85%
+Database query
+6.7 Outcome Metrics (North Star)
+Metric
+Definition
+Target (Month 9)
+Why It Matters
+Scholarships Won
+Total scholarships won by platform users
+500
+Ultimate proof of value
+Total Aid Disbursed
+₹ value of scholarships won via platform
+₹2 Crore
+Social impact + PR
+Application Success Rate
+Won / Applied per user
+≥25%
+Match quality validation
+Net Promoter Score (NPS)
+User likelihood to recommend (0–10 scale)
+≥55
+Word-of-mouth growth signal
+SECTION 7 — TECHNICAL REQUIREMENTS SUMMARY
+7.1 Core Technology Stack
+Layer
+Technology
+Notes
+Authentication
+Clerk
+clerkId as primary user identifier across all collections
+AI Matching
+Gemini-2.5-Flash
+Soft matching, SOP generation, AI Assistant
+PDF Extraction
+DeepSeek-v3.1 (MegaLLM)
+Python pipeline, idempotent, logged in processed_pdfs
+Document Storage
+Cloudinary
+publicId + uploadedAt stored in User.documents array
+Database
+MongoDB
+Collections: Scholarship, User, Application, processed_pdfs
+Frontend
+React / Next.js (recommended)
+SSR for public pages, CSR for dashboard
+Styling
+Tailwind CSS
+Custom tokens mapped to design system
+7.2 Database Collections Summary
+Scholarship: title, normTitle, provider, normProvider, courseRestriction, categoryRestriction, yearRestriction, benefits (stipend / tuitionWaiver / oneTimeGrant amounts), deadline, eligibilityCriteria, sourceUrl, status (active/expired)
+User: clerkId, personalInfo, educationLevel, course, year, gpa, state, firstGen (bool), disability (bool, type, percentage, certificateAvailable), income, category, documents (array of {type, publicId, uploadedAt}), areasOfInterest, profileCompletionScore
+Application: clerkId, scholarshipId, status (Saved/Applied/UnderReview/Won/Rejected), submittedAt, updatedAt — unique index on {clerkId, scholarshipId}
+processed_pdfs: sourceFile, status (Pending/Processing/Complete/Failed), insertedCount, duplicatesSkipped, extractedFields, model, processedAt
+7.3 Non-Functional Requirements
+Requirement
+Specification
+Mobile Responsiveness
+Full functionality at 375px, 480px, 768px, 1024px, 1440px
+Page Load Speed
+LCP ≤ 2.5s, FID ≤ 100ms, CLS ≤ 0.1
+Accessibility
+WCAG 2.1 AA compliance — critical for disability-status users
+Data Security
+HTTPS everywhere, Cloudinary signed URLs, Clerk-managed sessions
+Browser Support
+Chrome 90+, Safari 14+, Firefox 88+, Edge 90+
+Uptime SLA
+99.5% for student-facing pages, 99.9% for auth and matching engine
+SECTION 8 — LAUNCH ROADMAP
+Phase 1 — MVP Launch (Month 1–2)
+All P0 features. Public pages (Landing, Pricing, Auth). Core dashboard (Overview, Matches, Applications, Profile, Document Vault). Pipeline Monitor for admin.
+Phase 2 — Engagement Layer (Month 3–4)
+All P1 features. AI Assistant, SOP Generator full feature set, Kanban view, Application detail slide-over, Features and How It Works pages, Blog foundation.
+Phase 3 — Growth & Retention (Month 5–6)
+All P2 features. Email notifications, Application export, Won celebration states, Settings page, Match freshness indicators, About page.
+Phase 4 — B2B Expansion (Month 7–9)
+P3 features and new B2B personas. University portal white-labeling, API access for institutions, bulk student matching, advanced admin scholarship CRUD.
+SECTION 9-Competitive Analysis9.1 — COMPETITIVE LANDSCAPE OVERVIEW
+ScholarLogic enters a market with three distinct competitor archetypes: a government-operated monopoly with massive reach but zero intelligence (NSP), a well-funded Indian private aggregator with brand trust but no precision matching (Buddy4Study), and a US-based pioneer that invented the scholarship matching model but is showing its age and has no India relevance (Fastweb). None of the three combines AI-precision matching, automated PDF ingestion, SOP generation, and an integrated document vault in a single student-facing product. That gap is ScholarLogic's entire market opportunity.
+COMPETITIVE POSITIONING MAP
+                    HIGH AI / MATCHING INTELLIGENCE
+                              ↑
+                              │
+                              │         ● ScholarLogic
+                              │           (Target Position)
+                              │
+    BROAD            ─────────┼─────────              DEEP
+    DATABASE                  │                    ELIGIBILITY
+    FOCUS            ● Fastweb│                    PRECISION
+                     (US only)│
+                              │
+              ● Buddy4Study   │
+                              │
+              ● NSP           │
+                              │
+                              ↓
+                    LOW AI / MATCHING INTELLIGENCE
+9.2 — COMPETITOR 1: National Scholarship Portal (NSP)
+URL: scholarships.gov.in Type: Government-operated, Ministry of Electronics and IT (MeitY) Market Position: Dominant monopoly for government scholarship access in India Scale: 143 scholarship schemes worth ₹790+ crores, benefiting crores of students annually Buddy4Study Users: Tens of millions of Indian students annually
+9.2.1 — What NSP Does Well (Learn From)
+Institutional Trust & Government Authority NSP is a key part of the National e-Governance Plan, managing the entire scholarship process — from application to fund transfer — using a SMART system (Simplified, Mission-oriented, Accountable, Responsive, Transparent) Testbook that students inherently trust because it is government-backed. This level of institutional credibility cannot be manufactured by a startup. ScholarLogic should design for trust signals — security badges, verification indicators, and transparent data usage statements — to close this credibility gap.
+Direct Benefit Transfer Integration The NSP uses DBT to send money directly to the student's bank account through Direct Benefit Transfer, cutting out middlemen and making the process efficient. Testbook This frictionless fund delivery is a gold standard that students trust. ScholarLogic should integrate DBT status awareness into the Application Tracker so students can monitor fund disbursement status alongside application status.
+Comprehensive Scheme Coverage The portal brings together more than 140 scholarship schemes under one roof, designed for students from Class 1 to PhD. Vajiram & Ravi The breadth of coverage — spanning central ministries, state governments, UGC, AICTE — means NSP has the most complete government scholarship inventory in India. ScholarLogic must index all NSP-listed scholarships through its PDF pipeline to ensure full coverage of government schemes.
+Mobile Accessibility Push NSP 2.0 includes an NSP Mobile App available on Google Play and the UMANG platform, enabling faster application submissions and real-time tracking from mobile devices. Buddy4Study Mobile-first behavior is critical for the target demographic. ScholarLogic's responsive design must be equally capable on mobile.
+Aadhaar-Based Verification Integrity The NSP portal requires Aadhaar-based OTR (One Time Registration) — a unique 14-digit number applicable for the student's entire academic career — preventing duplicate accounts and ensuring genuine applications. NSP Scholarship This verification backbone gives NSP data integrity that private platforms struggle to match. ScholarLogic should explore DigiLocker integration as an equivalent trust layer.
+9.2.2 — What NSP Is Missing (Capitalize On)
+Zero Personalized Matching Intelligence NSP is an application portal, not a matching engine. Many students face delays or rejections. Common reasons include: not meeting the eligibility criteria for the selected scheme. Kpic Students routinely apply to scholarships they were never eligible for because NSP has no pre-application eligibility filter. There is no AI layer that says "out of 143 schemes, here are the 8 you actually qualify for." This is ScholarLogic's most direct competitive advantage — replacing blind browsing with precision-matched shortlists.
+Bureaucratic, Outdated UX NSP 2.0 requires mandatory One Time Registration using Aadhaar or Aadhaar-EID plus face authentication through the NSP OTR App. Testbook The registration process alone involves biometric authentication, Aadhaar linking, face authentication through a separate app, and multiple verification steps before a student can even begin applying. Students with smartphones but without easy Aadhaar access are effectively excluded. ScholarLogic's Clerk-based signup takes under 60 seconds with Google SSO.
+No SOP or Application Writing Support NSP provides zero assistance in writing the Statement of Purpose or personal statement required by most scholarship applications. Students are left to draft these documents entirely on their own, with no context about what the scholarship committee is looking for. ScholarLogic's AI SOP Generator with full profile context is a category-creating feature that NSP cannot provide.
+No Private/NGO/Corporate Scholarship Coverage NSP exclusively covers government-funded schemes. It has no coverage of the thousands of private foundation, corporate CSR, and NGO scholarships available to Indian students — Tata Trusts, HDFC Foundation, Infosys Foundation, L'Oréal, Kotak, etc. ScholarLogic's PDF pipeline ingests scholarship data from all sources, making it the only platform that offers both government and private scholarship coverage in a single matched list.
+No Document Vault Students must re-upload the same income certificate, caste certificate, and marksheets to every individual scholarship application on NSP. There is no centralized document storage. Missing or unclear uploaded documents and incorrect bank details are among the most common reasons for application rejection. Kpic ScholarLogic's Cloudinary-backed Document Vault — upload once, reuse everywhere — directly solves this.
+No Application Timeline Tracking NSP's "Track Your Status" function shows application approval stages within the NSP system. It provides no cross-scholarship pipeline view, no deadline calendar, no Saved → Applied → Won progression, and no way to manage multiple concurrent applications across different schemes.
+9.2.3 — ScholarLogic Differentiation vs NSP
+Dimension
+NSP
+ScholarLogic Advantage
+Matching
+None — browse all 143 schemes manually
+AI matches student to genuinely eligible scholarships only
+Eligibility filtering
+Student manually reads criteria
+Hard constraint filter eliminates ineligible schemes instantly
+Scholarship scope
+Government only
+Government + Private + NGO + Corporate
+SOP support
+None
+Gemini-2.5-Flash generates personalized, scholarship-specific SOP
+Document management
+Re-upload per application
+Cloudinary vault — upload once, reference everywhere
+UX friction
+High — Aadhaar face auth, OTR, multi-step verification
+Low — Google SSO, 60-second signup, guided onboarding
+Application tracking
+Single-scheme government pipeline only
+Cross-platform Saved → Applied → Won tracker
+Mobile experience
+App available but complex flow
+Fully responsive, dashboard accessible on any device
+AI assistance
+None
+ScholarBot answers profile-specific eligibility questions
+9.3 — COMPETITOR 2: Buddy4Study
+URL: buddy4study.com Type: Private, technology-enabled scholarship management platform (India's largest) Founded: 2011 Market Position: India's dominant private scholarship aggregator and facilitation platform Scale: Since inception, Buddy4Study has empowered over 1.37 lakh unique scholars through ₹630 crore in scholarships, with 200+ partners including HDFC Bank, L'Oréal India, and Infosys Foundation. The Tribune Competitive Threat Level: HIGH — most direct Indian competitor
+9.3.1 — What Buddy4Study Does Well (Learn From)
+Massive Corporate Partner Network The platform has 200+ partners and donors including global names like HDFC Bank, L'Oréal India, Colgate-Palmolive, GlaxoSmithKline Pharmaceuticals, Kotak Education Foundation, Bharti Airtel Foundation, and Infosys Foundation. The Tribune This partner network gives Buddy4Study an exclusive scholarship inventory that no aggregator-only platform can replicate. ScholarLogic should design an API layer and partnership program to attract corporate scholarship providers as data partners.
+Inclusive Demographic Coverage The platform hosts numerous scholarships to support transgender and PWD students, including the TATA AIA Paras Scholarship Program and the Legrand Empowering Scholarship. Additionally, it offers region-specific scholarships such as the Virchow Scholarship for students from Telangana and Andhra Pradesh. The Tribune Buddy4Study has demonstrated that granular demographic targeting — transgender, PWD, regional, discipline-specific — is both feasible and impactful at scale. This validates ScholarLogic's soft matching investment in first-gen, disability, and state residency signals.
+AI Chatbot Deployment (BuddyBot) Technology is at the core of Buddy4Study's mission. The platform's AI-powered BuddyBot efficiently handles thousands of queries, while seamless integrations with DigiLocker and automated fund transfers guarantee smooth, fraud-free disbursals. The Wire Buddy4Study has already validated the AI chatbot concept for Indian scholarship seekers. ScholarLogic's ScholarBot must offer meaningfully deeper profile awareness and actionability than BuddyBot to differentiate.
+DigiLocker Integration Seamless integrations with DigiLocker and automated fund transfers guarantee smooth, fraud-free disbursals. The Wire DigiLocker integration — allowing students to pull verified government documents directly into their applications — is a trust and friction-reduction feature ScholarLogic should prioritize in its v1.5 roadmap.
+Institutional Campus Expansion Buddy4Study is setting up 1,000 Student Financial Aid Offices at college and university campuses by March 2026, with each institution's designated staff trained as Financial Aid Counsellors. The Week This physical presence strategy creates institutional stickiness. ScholarLogic should consider a digital equivalent — a "campus ambassador" or university integration API — as a B2B growth channel.
+Proven Scale at Social Impact In FY 24-25, the platform enabled the disbursement of scholarships worth ₹230 crore to over 60,000 students. The Tribune This scale demonstrates that the Indian private scholarship market is real, fundable, and growing. It validates ScholarLogic's total addressable market assumptions.
+9.3.2 — What Buddy4Study Is Missing (Capitalize On)
+No Precision AI Eligibility Matching Buddy4Study is fundamentally an aggregation and facilitation platform, not a matching engine. Students browse or filter a large list — they are not served a ranked, AI-curated shortlist of scholarships they are genuinely eligible for. There is no equivalent of ScholarLogic's hard constraint filter (courseRestriction, yearRestriction, categoryRestriction) or Gemini-2.5-Flash soft matching. Students on Buddy4Study still face the fundamental discovery problem: too many scholarships, no reliable way to know which ones they actually qualify for.
+No SOP Generation or Writing Assistance Despite positioning itself as a full-spectrum scholarship support platform, Buddy4Study offers no AI-assisted SOP drafting, no personalized statement generation, and no writing guidance beyond generic articles. The application writing gap — arguably the highest-friction point in the entire scholarship journey — remains completely unaddressed. ScholarLogic's SOP Generator is therefore a direct response to the biggest unmet need that Buddy4Study's 1.37 lakh scholars have faced.
+No Integrated Document Vault Like NSP, Buddy4Study requires students to re-upload supporting documents for each scholarship application. There is no centralized, authenticated document store that persists across applications. ScholarLogic's Cloudinary vault — with document type categorization, version management, and upload-once-use-everywhere logic — provides a meaningfully better experience.
+UX and Product Age Buddy4Study was founded in 2011 and its product design reflects its age — dense, information-heavy pages, limited personalization, and an experience that feels like a government portal rather than a modern SaaS dashboard. There is no dark-mode option, no real-time match score visualization, no AI chat interface, and no progress-based profile completion gamification. ScholarLogic's design system and dashboard UX are built to the standard of 2026 SaaS products — not 2011 scholarship directories.
+No Developer-Facing Pipeline Transparency Buddy4Study has no visible equivalent of ScholarLogic's processed_pdfs tracking layer or admin pipeline monitor. Scholarship data quality and freshness are opaque to both administrators and users. ScholarLogic's traceability infrastructure — insertedCount, deduplication logging, model version tracking — creates a defensible data quality advantage.
+Match Accuracy Not Quantified or Guaranteed Buddy4Study makes no claims about match accuracy or eligibility precision. Students have no way of knowing, before investing time in an application, whether they genuinely qualify. ScholarLogic's visible match score (96%, 88%, etc.) with a "Why This Matched" rationale gives students confidence and reduces wasted effort — a fundamentally different promise than Buddy4Study's browse-and-apply model.
+9.3.3 — ScholarLogic Differentiation vs Buddy4Study
+Dimension
+Buddy4Study
+ScholarLogic Advantage
+Core model
+Aggregation + facilitation
+Precision AI matching engine
+Match intelligence
+Filter-based browsing
+Hard constraint + Gemini-2.5-Flash soft scoring
+Match score transparency
+None
+Visible % score + "Why This Matched" rationale per scholarship
+SOP support
+None
+Full AI SOP generation with profile context + tone/length controls
+Document management
+Re-upload per application
+Centralized Cloudinary vault with category management
+AI assistant
+BuddyBot (query handling)
+ScholarBot — profile-aware, match-aware, application-aware
+Product design era
+2011, aggregator-era UX
+2026, precision-matching SaaS dashboard
+Data pipeline
+Manual/partner data entry
+Automated DeepSeek-v3.1 PDF extraction with idempotent tracking
+Scholarship types
+Private/corporate focus
+Government + Private + NGO — unified matched list
+Pricing model
+Free (ad-supported)
+Freemium with clear paid tier value unlocks
+9.4 — COMPETITOR 3: Fastweb (fastweb.com)
+URL: fastweb.com Type: Private, US-based scholarship database and matching platform Founded: 1995 (pioneered online scholarship search) Market Position: Largest US scholarship database — not India-relevant, but the global benchmark for the matching model ScholarLogic is building Scale: 1.5 million scholarships in database; matched sample user with 80 scholarships totaling $500,800 in potential awards Scholarships360 Relevance to ScholarLogic: Strategic benchmark — what the matching model looks like at maturity, and what its failure modes are
+9.4.1 — What Fastweb Does Well (Learn From)
+Pioneered the Profile-Based Matching Model After signing up, students customize their profile by answering questions, and using their unique profile they get a list of scholarships they qualify for based on strengths, interests, student activities, and skills. Fastweb Fastweb invented this model in 1995 and it remains the core mechanic of every scholarship matching platform including ScholarLogic. The 30-year validation of this model — profile → match list → apply → win — confirms ScholarLogic's fundamental product architecture is sound.
+19-Dimensional Profile for Matching Precision Fastweb uses 19 profile questions that define uniqueness and power scholarship matching — including intended college, major, military experience, student activities, extracurricular activities, parent's occupation, and more. Fastweb This multi-dimensional profile approach — the exact philosophy behind ScholarLogic's Student Data Contract — produces meaningfully better matches than single-dimension filters. ScholarLogic's 4-step profile builder should aim for equivalent or greater depth.
+Scholarship Tracking as Core Feature Students can manage scholarship matches with filters and keep organized by updating the status of each scholarship from their matched list every time they visit. Fastweb has also added the ability to add scholarship deadlines directly to calendar apps including Apple, Google, Office 365, Outlook, and Yahoo. Fastweb Deadline calendar integration is a practical utility feature that reduces the most common application failure mode — missing deadlines. ScholarLogic should add calendar export (.ics file / Google Calendar direct add) to the Application Tracker.
+Email Digest for Re-Engagement A huge perk of Fastweb is that they send new scholarship matches to your email, along with internships you can apply for. This is a great tool for students as they don't need to open the platform to see new scholarships. Bold.org Push-based re-engagement via email digests reduces churn without requiring in-app behavior. ScholarLogic should implement a weekly "New Matches" email digest as a re-engagement tool for users who don't log in weekly.
+Content + Scholarship Hybrid Fastweb isn't just for scholarships. It provides students and their parents with helpful information to navigate educational journeys — from college or trade school, throughout college and graduate school, and into career. Fastweb The content layer (FAFSA guides, college admissions articles, financial aid tips) drives organic SEO traffic and positions Fastweb as an ongoing educational resource. ScholarLogic's blog roadmap (Month 4) should take inspiration from this content-as-acquisition strategy.
+9.4.2 — What Fastweb Is Missing (Capitalize On)
+Severely Outdated Matching Algorithm — Ineligible Matches Surface Regularly According to experience and some reviews from TrustPilot, students may be matched to older, expired scholarships that no longer exist. There were many poor fits mixed into the scholarship search feed, such as the Orange Scholars program which is only available to children of Home Depot Employees. Scholarships360 Fastweb's 30-year-old algorithm produces significant noise — scholarships that are expired, inapplicable, or only available to specific corporate employee families. This is the exact failure mode ScholarLogic's hard constraint filter and deduplication engine exist to prevent. Match precision is ScholarLogic's direct answer to Fastweb's greatest weakness.
+No AI-Native Features — No SOP Generator, No AI Assistant Despite operating for three decades and having massive scale, Fastweb has no AI-powered SOP generator, no AI chat interface, and no AI explanation of why a scholarship matched. The platform operates exactly as it did in 1995 — profile in, list out, student does everything else manually. ScholarLogic's Gemini-2.5-Flash integration for both matching intelligence and SOP generation represents a generational leap that Fastweb has not made.
+All Applications Redirect to External Sites Fastweb redirects students to external websites, often requiring them to create multiple accounts for different applications. Bold.org allows students to apply directly on the platform using a single, free account. This distinction affects ease of use and application completion rates. Bold.org Fastweb has never solved the application fragmentation problem — students must leave the platform, create new accounts on provider websites, and manage multiple credential sets. ScholarLogic's Application Tracker and Document Vault don't eliminate this entirely, but they centralize the management layer and the SOP/document preparation so students arrive at external application portals fully prepared.
+No Integrated Document Management Fastweb offers zero document storage. Students must manage their certificates, transcripts, and recommendation letters independently and re-upload them to every provider portal. ScholarLogic's Document Vault directly addresses this gap.
+Heavy Advertising Degrades Experience Fastweb also utilizes a lot of advertisements which can distract and deter students from continuing their scholarship search. Fastweb offers extensive variety but contains a lot of unvetted scholarships and offers a clunky user experience. Scholarships360 Ad monetization creates an adversarial product experience — the platform's revenue incentives are misaligned with student outcomes. ScholarLogic's freemium model means revenue comes from student plan upgrades, not advertisers — creating full alignment between platform success and student success. This is a values-level differentiator worth communicating explicitly in marketing.
+Zero India Relevance Fastweb is built entirely for the US scholarship market. It has no Indian scholarship data, no ₹ currency support, no understanding of Indian eligibility categories (SC/ST/OBC/EWS), no coverage of NSP schemes, no state domicile logic, and no first-generation learner detection relevant to India's educational context. Every ScholarLogic feature is built India-first by design — a structural moat that Fastweb could never penetrate without rebuilding from scratch.
+Gated Content Frustrates Discovery All of the scholarship content on Fastweb is gated, so students must create an account. This makes for a clunky user experience. Scholarships360 Requiring account creation before showing any scholarship data creates friction that discourages exploration. ScholarLogic's public-facing Features page and How It Works page should demonstrate real match examples without login, allowing students to understand the platform's value before committing to signup.
+9.4.3 — ScholarLogic Differentiation vs Fastweb
+Dimension
+Fastweb
+ScholarLogic Advantage
+Geographic relevance
+US only
+India-first — NSP, UGC, AICTE, state schemes, corporate CSR
+Match accuracy
+Algorithm produces expired and ineligible matches
+DeepSeek-v3.1 extraction + hard constraints + Gemini soft matching
+AI features
+None — 1995-era rule-based matching
+Gemini-2.5-Flash matching, SOP generation, ScholarBot
+Application experience
+Redirects to 50+ external provider sites
+Centralized tracker, document vault, AI-prepared applications
+Document management
+None
+Cloudinary vault — categorized, persistent, reusable
+Revenue model
+Ad-supported (misaligned incentives)
+Freemium subscription (aligned with student success)
+Data freshness
+Expired scholarships in active results
+processed_pdfs tracking ensures current-only data
+SOP support
+None
+Full profile-contextual SOP generation with tone/length controls
+UX era
+Mid-2000s portal design
+2026 SaaS dark-mode dashboard
+Content gating
+All content requires account
+Public pages demonstrate value pre-signup
+9.5 — CONSOLIDATED COMPETITIVE GAP ANALYSIS
+9.5.1 — Feature Gap Matrix
+Feature
+NSP
+Buddy4Study
+Fastweb
+ScholarLogic
+AI Eligibility Matching
+❌
+❌
+⚠️ Basic
+✅ Hard + Soft AI
+Match Score with Rationale
+❌
+❌
+❌
+✅ % + "Why"
+SOP Generator
+❌
+❌
+❌
+✅ Gemini-powered
+AI Chat Assistant
+❌
+⚠️ BuddyBot
+❌
+✅ Profile-aware
+Document Vault
+❌
+❌
+❌
+✅ Cloudinary
+Application Tracker
+⚠️ NSP-only
+❌
+⚠️ Basic
+✅ Cross-platform
+Automated Data Pipeline
+❌
+❌
+❌
+✅ DeepSeek PDF
+Private Scholarship Coverage
+❌
+✅
+✅ (US)
+✅
+Government Scholarship Coverage
+✅
+⚠️ Partial
+❌
+✅ Via pipeline
+India-Specific Eligibility Logic
+✅
+✅
+❌
+✅
+First-Gen / Disability Detection
+⚠️ Manual filter
+⚠️ Category only
+❌
+✅ AI soft match
+Mobile Responsive
+✅ App
+✅ App
+✅
+✅ PWA-ready
+Ad-Free Experience
+✅
+✅
+❌
+✅
+Freemium Model
+❌ Free
+❌ Free
+❌ Ad-funded
+✅ Free + Paid tiers
+Deduplication Engine
+⚠️ Manual
+❌
+❌
+✅ normTitle index
+Legend: ✅ Full capability | ⚠️ Partial/limited | ❌ Not available
+9.5.2 — The Whitespace ScholarLogic Owns
+Based on the competitive analysis, ScholarLogic has clear, uncontested ownership of the following capability cluster that no competitor — Indian or global — currently provides:
+"The AI-Precision Scholarship Operating System"
+The combination of:
+Automated structured data ingestion (DeepSeek-v3.1 PDF pipeline → processed_pdfs tracking)
+Two-layer precision matching (hard constraints + Gemini soft demographic scoring)
+Visible match intelligence (% score + "Why This Matched" rationale)
+AI application preparation (SOP generator + ScholarBot)
+Centralized application infrastructure (Document Vault + Application Tracker)
+...across a single authenticated student dashboard, built India-first with ₹ currency, Indian eligibility categories, state domicile logic, and first-gen/disability detection.
+No competitor has more than two of these five pillars. ScholarLogic is the only platform building all five simultaneously.
+9.5.3 — Competitive Risks & Mitigation
+Risk
+Likelihood
+Impact
+Mitigation
+Buddy4Study adds AI matching
+High (12–18 months)
+High
+Build match score transparency and SOP quality as moat — network effects from student profile data compound over time
+NSP launches AI eligibility checker
+Medium (24+ months)
+High
+Government AI moves slowly — lead with UX quality and private scholarship coverage NSP can never offer
+New India AI scholarship startup enters
+High
+Medium
+First-mover advantage in processed_pdfs database depth — 25,000+ structured scholarships is a high rebuild cost
+Fastweb launches India product
+Low
+Medium
+US-centric data infrastructure cannot simply be re-skinned for India — ScholarLogic's India-native data model is a structural moat
+Gemini/Google launches competing product
+Low
+Very High
+Unlikely — Google builds infrastructure, not student-facing verticals. Partnership opportunity more likely than competition
+Data quality concerns erode trust
+Medium
+High
+processed_pdfs traceability + admin pipeline monitor + weekly deduplication audit — make data quality a visible, marketed feature
+9.6 — UNIQUE DIFFERENTIATORS: WHAT ONLY SCHOLARLOGIC CAN OFFER
+Based on comprehensive analysis of all three competitors, these are ScholarLogic's category-defining capabilities that no competitor offers and that should be foregrounded in all marketing, onboarding, and sales conversations:
+1. The Match Score — Visible Eligibility Confidence A percentage match score with a human-readable rationale ("Matched because you are a first-generation learner from Maharashtra with visual impairment — this scholarship specifically targets this demographic") is completely absent from every competitor. It converts scholarship discovery from a hope-and-apply activity into a confident, evidence-based decision. This is ScholarLogic's most marketable single feature.
+2. The SOP Generator — Removing the Hardest Barrier The Statement of Purpose is the single most time-consuming and anxiety-inducing part of scholarship applications for Indian students, especially first-generation learners who have no family precedent for academic writing. No competitor — NSP, Buddy4Study, or Fastweb — provides any assistance with this. ScholarLogic's Gemini-powered SOP Generator with profile context, tone selection, and scholarship-specific targeting is the only product in the Indian market that removes this barrier entirely.
+3. The Student Data Contract — Profile Depth as a Moat ScholarLogic captures more eligibility-relevant student data than any competitor: education level, course, year, GPA, state residency, first-gen status, disability type and percentage, income bracket, category, and areas of interest. This depth creates a compounding data advantage — the richer the profile, the more accurate the matching, the more personalized the SOP, the more relevant the AI Assistant responses. Competitors with shallower profiles cannot replicate ScholarLogic's matching precision without rebuilding their entire data model.
+4. The PDF Pipeline — Data Freshness as Differentiation ScholarLogic's automated DeepSeek-v3.1 ingestion pipeline — with idempotent extraction, deduplication, and processed_pdfs traceability — means the scholarship database stays current without manual data entry. Competitors rely on manual curation or partner-submitted data, both of which are slower and more error-prone. As the pipeline matures and indexes more sources, ScholarLogic's data depth becomes a structural moat that requires years to replicate.
+5. The Unified Scholarship Operating System — No Platform Fragmentation ScholarLogic is the only platform where a student can discover scholarships (matched list), understand their eligibility (AI rationale), prepare their application (SOP Generator + Document Vault), manage their pipeline (Application Tracker), and get real-time guidance (ScholarBot) — all within a single authenticated session with a single profile. Every competitor requires students to use multiple platforms, maintain multiple accounts, and re-enter the same information repeatedly. ScholarLogic's integration is the product.

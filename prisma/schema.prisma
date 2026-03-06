@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Core User ───────────────────────────────────────────
+model User {
+  id                String           @id @default(cuid())
+  clerkId           String           @unique
+  email             String           @unique
+  profileCompletion Int              @default(0)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  profile           StudentProfile?
+  applications      Application[]
+  matchScores       MatchScore[]
+  documents         Document[]
+  chatMessages      ChatMessage[]
+  sopDrafts         SOPDraft[]
+}
+
+// ─── Student Profile (filled during onboarding) ─────────
+model StudentProfile {
+  id             String   @id @default(cuid())
+  clerkId        String   @unique
+  fullName       String
+  dateOfBirth    String?
+  gender         String?
+  phone          String?
+
+  educationLevel String
+  course         String
+  yearOfStudy    String
+  gpa            String?
+  institution    String?
+
+  state          String
+  category       String
+  firstGen       Boolean  @default(false)
+  disability     Boolean  @default(false)
+
+  incomeBracket  String
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+}
+
+// ─── Scholarship (populated by AI pipeline) ─────────────
+model Scholarship {
+  id                String    @id @default(cuid())
+  name              String
+  provider          String
+  description       String?
+  amount            String
+  amountType        String?
+  deadline          DateTime?
+  applicationUrl    String?
+  sourceFile        String?
+  eligibilityRules  Json      @default("[]")
+  requiredDocuments String[]  @default([])
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  applications      Application[]
+  matchScores       MatchScore[]
+}
+
+// ─── Application Tracker ─────────────────────────────────
+model Application {
+  id            String            @id @default(cuid())
+  clerkId       String
+  scholarshipId String
+  status        ApplicationStatus @default(SAVED)
+  notes         String?
+  savedAt       DateTime          @default(now())
+  appliedAt     DateTime?
+  wonAt         DateTime?
+
+  user          User              @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+  scholarship   Scholarship       @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  @@unique([clerkId, scholarshipId])
+  @@index([clerkId, status])
+}
+
+// ─── AI Match Scores ─────────────────────────────────────
+model MatchScore {
+  id            String      @id @default(cuid())
+  clerkId       String
+  scholarshipId String
+  score         Int
+  rationale     String
+  matchedRules  Json?
+
+  user          User        @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+  scholarship   Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime    @default(now())
+
+  @@unique([clerkId, scholarshipId])
+}
+
+// ─── Secure Document Vault ───────────────────────────────
+model Document {
+  id         String   @id @default(cuid())
+  clerkId    String
+  name       String
+  fileType   String
+  fileSize   Int
+  fileData   Bytes
+  status     String   @default("pending")
+  uploadedAt DateTime @default(now())
+
+  user       User     @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+}
+
+// ─── AI Chat History ─────────────────────────────────────
+model ChatMessage {
+  id        String   @id @default(cuid())
+  clerkId   String
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+
+  @@index([clerkId, createdAt])
+}
+
+// ─── SOP Drafts ──────────────────────────────────────────
+model SOPDraft {
+  id              String   @id @default(cuid())
+  clerkId         String
+  scholarshipName String
+  content         String
+  instructions    String?
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+}
+
+// ─── Pipeline Jobs (admin) ───────────────────────────────
+model PipelineJob {
+  id             String   @id @default(cuid())
+  fileName       String
+  status         String   @default("queued")
+  model          String   @default("Gemini-2.5-Flash")
+  extractedCount Int      @default(0)
+  duration       String?
+  error          String?
+  scholarshipId  String?
+  resultData     Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  UNDER_REVIEW
+  WON
+  REJECTED
+}
