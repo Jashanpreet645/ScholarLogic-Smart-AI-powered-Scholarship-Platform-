@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { runMatchingEngine } from "@/lib/actions/match.actions";
+import { Progress } from "@/components/ui/progress";
+import { MatchEngineRunner } from "@/components/dashboard/MatchEngineRunner";
 
 export default async function DashboardOverview() {
   const user = await currentUser();
@@ -55,15 +56,7 @@ export default async function DashboardOverview() {
   ]);
 
   const profileComplete = !!profile;
-
-  // If profile exists but no matches, try running the matching engine
-  if (profileComplete && matchCount === 0) {
-    try {
-      await runMatchingEngine();
-    } catch {
-      // Silently ignore - matches will be computed on next page load
-    }
-  }
+  const profileCompletion = profileComplete ? 100 : 0;
 
   return (
     <div className="flex flex-col gap-8 w-full">
@@ -80,20 +73,29 @@ export default async function DashboardOverview() {
       </div>
 
       {!profileComplete && (
-        <Card className="bg-primary/10 border-primary/30">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold mb-1">
-                  Complete Your Profile
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Fill out your student profile to get AI-matched scholarships.
+        <Card className="bg-primary/10 border-primary/30 overflow-hidden relative shadow-lg">
+          <div className="absolute top-0 left-0 w-full h-1 bg-primary/20">
+            <div className="h-full bg-primary transition-all duration-1000 ease-out" style={{ width: `${profileCompletion}%` }} />
+          </div>
+          <CardContent className="pt-6 pb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <h3 className="text-xl font-bold text-foreground">
+                    Complete Your Profile
+                  </h3>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary uppercase tracking-wider">
+                    {profileCompletion}% Complete
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Fill out your student profile to unlock the AI matching engine and discover 1,000+ opportunities.
                 </p>
+                <Progress value={profileCompletion} className="h-2 w-full max-w-md bg-background/50" />
               </div>
-              <Button asChild>
+              <Button asChild size="lg" className="shrink-0 w-full md:w-auto text-md font-bold shadow-[0_0_20px_rgba(123,92,250,0.4)] hover:bg-primary-hover hover:scale-105 transition-all bg-primary">
                 <Link href="/onboarding">
-                  Build Profile <ArrowRight className="w-4 h-4 ml-2" />
+                  {profileCompletion > 0 ? "Continue Setup" : "Build Profile"} <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
             </div>
@@ -102,7 +104,7 @@ export default async function DashboardOverview() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-card border-border">
+        <Card className="glass-card glass-card-hover border-t-2 border-t-primary/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Active Matches
@@ -117,7 +119,7 @@ export default async function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card className="glass-card glass-card-hover border-t-2 border-t-muted-foreground/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Saved Applications
@@ -130,7 +132,7 @@ export default async function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card className="glass-card glass-card-hover border-t-2 border-t-blue-400/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Under Review</CardTitle>
             <GraduationCap className="h-4 w-4 text-blue-400" />
@@ -141,7 +143,7 @@ export default async function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card className="glass-card glass-card-hover border-t-2 border-t-emerald-400/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Scholarships Won
@@ -163,7 +165,7 @@ export default async function DashboardOverview() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {topMatches.map((match) => (
               <Link href="/dashboard/matches" key={match.id}>
-                <Card className="hover:border-primary/50 transition-colors cursor-pointer bg-card overflow-hidden">
+                <Card className="glass-card glass-card-hover transition-colors cursor-pointer overflow-hidden group">
                   <div
                     className="h-2"
                     style={{
@@ -233,19 +235,7 @@ export default async function DashboardOverview() {
       )}
 
       {topMatches.length === 0 && profileComplete && (
-        <Card className="bg-card border-border">
-          <CardContent className="pt-6 text-center">
-            <Sparkles className="w-8 h-8 text-primary mx-auto mb-3" />
-            <h3 className="font-semibold mb-1">No Matches Yet</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Scholarships need to be added to the database first. Ask an admin
-              to upload scholarship PDFs via the Pipeline Monitor.
-            </p>
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/admin">Go to Admin Pipeline</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <MatchEngineRunner />
       )}
     </div>
   );

@@ -1,5 +1,9 @@
 import { generateObject } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.Gemini_API_Key!,
+});
 import { z } from "zod";
 
 export const scholarshipExtractionSchema = z.object({
@@ -62,7 +66,7 @@ Provide the scholarship amount and type (stipend, one-time, annual, tuition_waiv
 
   try {
     const { object } = await generateObject({
-      model: google("gemini-2.0-flash"),
+      model: google("gemini-2.5-flash"),
       schema: scholarshipExtractionSchema,
       messages: [
         {

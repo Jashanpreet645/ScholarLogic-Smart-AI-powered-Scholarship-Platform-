@@ -48,24 +48,24 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #0D0D12;
-  --foreground: #F0EFF8;
-  --card: #13131A;
-  --card-foreground: #F0EFF8;
-  --popover: #1A1A26;
-  --popover-foreground: #F0EFF8;
+  --background: #ffffff;
+  --foreground: #0D0D12;
+  --card: #F4F4F9;
+  --card-foreground: #0D0D12;
+  --popover: #ffffff;
+  --popover-foreground: #0D0D12;
   --primary: #7B5CFA;
   --primary-foreground: #ffffff;
-  --secondary: #2A2840;
-  --secondary-foreground: #F0EFF8;
-  --muted: #1A1A26;
-  --muted-foreground: #9A98B0;
-  --accent: #1A1A26;
-  --accent-foreground: #F0EFF8;
-  --destructive: #F87171;
+  --secondary: #E5E5EB;
+  --secondary-foreground: #0D0D12;
+  --muted: #F4F4F9;
+  --muted-foreground: #5C5A74;
+  --accent: #F4F4F9;
+  --accent-foreground: #0D0D12;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #2A2840;
-  --input: #2A2840;
+  --border: #E5E5EB;
+  --input: #E5E5EB;
   --ring: #7B5CFA;
 }
 
@@ -98,4 +98,67 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-foreground/5 shadow-lg dark:bg-card/40 dark:border-white/5 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.36)];
+  }
+  
+  .glass-card-hover {
+    @apply hover:bg-card/80 hover:border-primary/30 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl dark:hover:bg-card/60 dark:hover:shadow-[0_8px_32px_0_rgba(123,92,250,0.15)];
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent-light to-info;
+  }
+
+  .animate-blob {
+    animation: blob 15s infinite alternate ease-in-out;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+    border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(1.05); }
 }

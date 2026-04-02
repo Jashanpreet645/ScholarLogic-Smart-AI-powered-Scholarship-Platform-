@@ -10,6 +10,8 @@ export const metadata: Metadata = {
 };
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "@/components/theme-provider";
+import { HeaderControls } from "@/components/layout/HeaderControls";
 
 export default function RootLayout({
   children,
@@ -18,11 +20,19 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className="dark">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${inter.variable} font-sans antialiased`}
         >
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <HeaderControls />
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

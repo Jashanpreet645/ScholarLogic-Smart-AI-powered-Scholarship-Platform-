@@ -6,6 +6,43 @@ import { revalidatePath } from "next/cache";
 import type { ApplicationStatus } from "@prisma/client";
 
 /**
+ * Toggle save (create or delete) for a scholarship.
+ */
+export async function toggleSaveApplication(scholarshipId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const existing = await prisma.application.findUnique({
+    where: {
+      clerkId_scholarshipId: {
+        clerkId: userId,
+        scholarshipId,
+      },
+    },
+  });
+
+  if (existing) {
+    await prisma.application.delete({
+      where: { id: existing.id },
+    });
+  } else {
+    await prisma.application.create({
+      data: {
+        clerkId: userId,
+        scholarshipId,
+        status: "SAVED",
+      },
+    });
+  }
+
+  revalidatePath("/dashboard/applications");
+  revalidatePath("/dashboard/matches");
+  revalidatePath("/dashboard");
+  
+  return { saved: !existing };
+}
+
+/**
  * Save or create an application for a scholarship.
  */
 export async function saveApplication(scholarshipId: string) {

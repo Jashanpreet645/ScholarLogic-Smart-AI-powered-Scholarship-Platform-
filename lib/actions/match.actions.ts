@@ -2,8 +2,9 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { computeMatches } from "@/lib/ai/matcher";
+import { computeMatches, analyzeScholarshipMatch } from "@/lib/ai/matcher";
 import { revalidatePath } from "next/cache";
+import type { EligibilityRule } from "@/lib/types";
 
 /**
  * Run the matching engine for the current user against all active scholarships.
@@ -53,7 +54,7 @@ export async function runMatchingEngine() {
       name: s.name,
       provider: s.provider,
       amount: s.amount,
-      eligibilityRules: (s.eligibilityRules as unknown[]) as import("@/lib/types").EligibilityRule[],
+      eligibilityRules: (s.eligibilityRules as unknown[]) as EligibilityRule[],
     }))
   );
 
@@ -89,6 +90,85 @@ export async function runMatchingEngine() {
   revalidatePath("/dashboard/matches");
 
   return { matched: matchedCount };
+}
+
+/**
+ * Analyze a single scholarship match on-demand (triggered by user clicking "Analyze with AI").
+ * This saves API quota by only calling Gemini when the user explicitly requests it.
+ */
+export async function analyzeScholarship(scholarshipId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const profile = await prisma.studentProfile.findUnique({
+    where: { clerkId: userId },
+  });
+  if (!profile) throw new Error("Complete your profile first");
+
+  const scholarship = await prisma.scholarship.findUnique({
+    where: { id: scholarshipId },
+    select: {
+      id: true,
+      name: true,
+      provider: true,
+      amount: true,
+      eligibilityRules: true,
+    },
+  });
+  if (!scholarship) throw new Error("Scholarship not found");
+
+  const result = await analyzeScholarshipMatch(
+    {
+      fullName: profile.fullName,
+      gender: profile.gender,
+      educationLevel: profile.educationLevel,
+      course: profile.course,
+      yearOfStudy: profile.yearOfStudy,
+      gpa: profile.gpa,
+      state: profile.state,
+      category: profile.category,
+      firstGen: profile.firstGen,
+      disability: profile.disability,
+      incomeBracket: profile.incomeBracket,
+    },
+    {
+      id: scholarship.id,
+      name: scholarship.name,
+      provider: scholarship.provider,
+      amount: scholarship.amount,
+      eligibilityRules: (scholarship.eligibilityRules as unknown[]) as EligibilityRule[],
+    }
+  );
+
+  // Save the result to the database for future visits
+  await prisma.matchScore.upsert({
+    where: {
+      clerkId_scholarshipId: {
+        clerkId: userId,
+        scholarshipId: scholarship.id,
+      },
+    },
+    update: {
+      score: result.score,
+      rationale: result.rationale,
+      matchedRules: result.matchedRules as object[],
+    },
+    create: {
+      clerkId: userId,
+      scholarshipId: scholarship.id,
+      score: result.score,
+      rationale: result.rationale,
+      matchedRules: result.matchedRules as object[],
+    },
+  });
+
+  revalidatePath("/dashboard/matches");
+
+  return {
+    score: result.score,
+    rationale: result.rationale,
+    matchedRules: result.matchedRules,
+  };
 }
 
 /**

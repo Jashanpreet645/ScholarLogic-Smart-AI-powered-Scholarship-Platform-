@@ -1,5 +1,9 @@
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.Gemini_API_Key!,
+});
 
 interface StudentContext {
   fullName: string;
@@ -51,7 +55,7 @@ RULES:
 - Format responses with markdown for readability`;
 
   return streamText({
-    model: google("gemini-2.0-flash"),
+    model: google("gemini-2.5-flash"),
     system: systemPrompt,
     messages: messages.map((m) => ({
       role: m.role as "user" | "assistant",

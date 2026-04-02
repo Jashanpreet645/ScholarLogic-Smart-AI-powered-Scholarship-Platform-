@@ -1,5 +1,9 @@
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.Gemini_API_Key!,
+});
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
@@ -60,7 +64,7 @@ GUIDELINES:
 Return ONLY the SOP text, no metadata or formatting instructions.`;
 
     const { text } = await generateText({
-      model: google("gemini-2.0-flash"),
+      model: google("gemini-2.5-flash"),
       prompt: systemPrompt,
       temperature: 0.7,
     });
