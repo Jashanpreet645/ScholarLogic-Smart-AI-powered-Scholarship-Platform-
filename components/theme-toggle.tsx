@@ -24,19 +24,10 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="relative w-10 h-10 shrink-0 aspect-square rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-90 group outline-hidden"
+      className="relative w-10 h-10 shrink-0 aspect-square rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground bg-primary/10 dark:bg-primary/20 border border-primary/20 dark:border-primary/40 hover:bg-primary/20 dark:hover:bg-primary/30 transition-all duration-300 active:scale-90 group outline-hidden hover:shadow-lg hover:shadow-primary/10"
       aria-label="Toggle theme"
     >
-      {/* Floating Glow Background */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={theme}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          className="absolute inset-0 rounded-full blur-md opacity-0 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-tr from-primary/40 via-violet-500/40 to-blue-500/40"
-        />
-      </AnimatePresence>
+    
 
       <div className="relative z-10">
         <AnimatePresence mode="wait">

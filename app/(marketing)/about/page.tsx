@@ -142,10 +142,10 @@ export default function AboutUsPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
-                            { name: "Jashanpreet Singh", role: "Full Stack Developer & Lead Dev", color: "from-violet-500/20", githubUrl: "https://github.com/Jashanpreet645", image: "/team/jashan.jpg" },
-                            { name: "Gursharen Kaur Suri", role: "UI/UX & Product Design", color: "from-blue-500/20", githubUrl: "https://github.com/GursharenKaur", image: "/team/gursharen.jpg.jpeg" },
-                            { name: "Gautam Garg", role: "AI Architect & Backend Systems Lead", color: "from-emerald-500/20", githubUrl: "https://github.com/Gautam12NI", image: "/team/gautam.jpg" },
-                            { name: "Sehaj Juneja", role: "AI & Prompt Engineer", color: "from-amber-500/20", githubUrl: "https://github.com/sehajgithub", image: "/team/sehaj.jpg" }
+                            { name: "Jashanpreet Singh", role: "Full Stack Developer", color: "from-violet-500/20", githubUrl: "https://github.com/Jashanpreet645", image: "/team/jashan.jpg" },
+                            { name: "Gursharen Kaur Suri", role: "Backend Logic Developer", color: "from-blue-500/20", githubUrl: "https://github.com/GursharenKaur", image: "/team/gursharen.jpg.jpeg" },
+                            { name: "Gautam Garg", role: "Lead Architect & Full Stack Developer", color: "from-emerald-500/20", githubUrl: "https://github.com/Gautam12NI", image: "/team/gautam.jpg" },
+                            { name: "Sehaj Juneja", role: "Lead UI/UX & Product Design", color: "from-amber-500/20", githubUrl: "https://github.com/sehajgithub", image: "/team/sehaj.jpg" }
                         ].map((member, i) => (
                             <motion.div 
                                 key={i}
