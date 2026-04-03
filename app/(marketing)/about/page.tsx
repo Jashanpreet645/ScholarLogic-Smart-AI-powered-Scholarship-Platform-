@@ -142,10 +142,10 @@ export default function AboutUsPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
-                            { name: "Jashanpreet Singh", role: "AI Architect & Lead Dev", color: "from-violet-500/20", githubUrl: "https://github.com/Jashanpreet645" },
-                            { name: "Gursharen Kaur Suri", role: "UI/UX & Product Design", color: "from-blue-500/20", githubUrl: "https://github.com/" },
-                            { name: "Gautam Garg", role: "Backend Systems Lead", color: "from-emerald-500/20", githubUrl: "https://github.com/" },
-                            { name: "Sehaj Juneja", role: "Full Stack Developer", color: "from-amber-500/20", githubUrl: "https://github.com/" }
+                            { name: "Jashanpreet Singh", role: "Full Stack Developer & Lead Dev", color: "from-violet-500/20", githubUrl: "https://github.com/Jashanpreet645", image: "/team/jashan.jpg" },
+                            { name: "Gursharen Kaur Suri", role: "UI/UX & Product Design", color: "from-blue-500/20", githubUrl: "https://github.com/GursharenKaur", image: "/team/gursharen.jpg.jpeg" },
+                            { name: "Gautam Garg", role: "AI Architect & Backend Systems Lead", color: "from-emerald-500/20", githubUrl: "https://github.com/Gautam12NI", image: "/team/gautam.jpg" },
+                            { name: "Sehaj Juneja", role: "AI & Prompt Engineer", color: "from-amber-500/20", githubUrl: "https://github.com/sehajgithub", image: "/team/sehaj.jpg" }
                         ].map((member, i) => (
                             <motion.div 
                                 key={i}
@@ -153,14 +153,38 @@ export default function AboutUsPage() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.1 }}
                                 viewport={{ once: true }}
-                                className="group relative p-6 rounded-3xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-500"
+                                className="group relative p-8 rounded-[32px] bg-white/[0.03] dark:bg-white/[0.02] border border-white/10 dark:border-white/10 hover:border-primary/50 hover:bg-white/[0.05] transition-all duration-500 shadow-[0_0_50px_-12px_rgba(123,92,250,0.35)] dark:shadow-[0_0_60px_-10px_rgba(123,92,250,0.45)] hover:shadow-2xl hover:shadow-primary/60"
                             >
                                 {/* Photo Container - Floating effect */}
-                                <div className={`aspect-square rounded-2xl bg-gradient-to-br ${member.color} to-transparent border border-white/5 mb-6 overflow-hidden relative group-hover:scale-[1.02] transition-all duration-500`}>
-                                    <div className="absolute inset-0 flex items-center justify-center text-foreground/20 italic text-xs">
-                                        Upload Photo Here
+                                <div className={`aspect-square rounded-2xl bg-gradient-to-br ${member.color} to-transparent border border-white/10 mb-6 overflow-hidden relative group-hover:scale-[1.02] transition-all duration-500 shadow-inner`}>
+                                    <div className="absolute inset-0 flex items-center justify-center text-foreground/20">
+                                        <img 
+                                            src={member.image} 
+                                            alt={member.name}
+                                            className="w-full h-full object-cover object-top opacity-0 transition-opacity duration-700 relative z-10"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                const parent = target.parentElement;
+                                                if (parent) {
+                                                    const statusText = parent.querySelector('.status-text');
+                                                    if (statusText) statusText.innerHTML = 'Photo Not Found';
+                                                }
+                                                target.classList.add('hidden');
+                                            }}
+                                            onLoad={(e) => {
+                                                (e.target as HTMLImageElement).classList.remove('opacity-0');
+                                                const parent = (e.target as HTMLImageElement).parentElement;
+                                                if (parent) {
+                                                    const loader = parent.querySelector('.loader-bg');
+                                                    if (loader) (loader as HTMLElement).style.display = 'none';
+                                                }
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-card -z-0 loader-bg">
+                                            <span className="italic text-[10px] text-muted-foreground/20 animate-pulse status-text">Awaiting Sync...</span>
+                                        </div>
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 z-20">
                                         <a 
                                             href={member.githubUrl} 
                                             target="_blank" 
